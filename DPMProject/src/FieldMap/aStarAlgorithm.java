@@ -5,7 +5,7 @@ import java.util.Stack;
 
 public class aStarAlgorithm {
 	
-	public static int[] aStar(Tile[][] myMap, int xStart,int yStart, int xEnd, int yEnd) {
+	public static Task[] aStar(Tile[][] myMap, int xStart,int yStart, int xEnd, int yEnd) {
 		ArrayList<Tile> openSet = new ArrayList<Tile>();
 		ArrayList<Tile> closedSet = new ArrayList<Tile>();
 		ArrayList<Tile> obstacles = new ArrayList<Tile>();
@@ -113,30 +113,30 @@ public class aStarAlgorithm {
 	}
 
 
-	private static int[] returnRoute(Tile cell) {
+	private static Task[] returnRoute(Tile cell) {
 		Tile currentCell = cell;
 		Tile parent = currentCell.getParent();
-		Stack<Integer> temp = new Stack<Integer>();
+		Stack<Task> temp = new Stack<Task>();
 		while (parent != null) {
 			int dX = currentCell.getTileIndexX() - parent.getTileIndexX();
 			int dY = currentCell.getTileIndexY() - parent.getTileIndexY();
 
 			if (dX == 1)
-				temp.push(0); //go right
+				temp.push(Task.MOVERIGHT); //go right
 			if (dX == -1)
-				temp.push(2); //go left
+				temp.push(Task.MOVELEFT); //go left
 			if (dY == 1)
-				temp.push(1); //go down
+				temp.push(Task.MOVEUP); //go down
 			if (dY == -1)
-				temp.push(3); //go up
+				temp.push(Task.MOVEDOWN); //go up
 
 			currentCell = parent;
 			parent = currentCell.getParent();
 		}
-		int route[] = new int[temp.size()];
+		Task route[] = new Task[temp.size()];
 		for (int i = 0; i < route.length; i++) {
 
-			route[i] = (int) temp.pop();
+			route[i] = temp.pop();
 		}
 		return route;
 	}

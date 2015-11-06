@@ -11,7 +11,7 @@ public class TestField {
 		myField.getTile(1, 1).setBlock(Block.BLOCKED);
 
 		myField.displayField();
-		int[]path= aStarAlgorithm.aStar(myField.getTiles(), 1,2, 6,1);
+		Task[]path= aStarAlgorithm.aStar(myField.getTiles(), 1,2, 6,1);
 		for(int i=0;i<path.length;i++){
 			System.out.print(path[i]);
 		}
