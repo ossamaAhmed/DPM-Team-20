@@ -21,10 +21,10 @@ public class Initialization {
 
 	// Static Resources:
 	// TODO
-	private static final EV3LargeRegulatedMotor[] drivingMotor = { new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A")), new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B")) };
+	private static final EV3LargeRegulatedMotor[] drivingMotor = { new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A")), new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D")) };
 	private static final EV3LargeRegulatedMotor[] armMotor = { new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C")), new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D")) };
 	private static final Port usPort = LocalEV3.get().getPort("S1");
-	private static final Port[] colorPort = { LocalEV3.get().getPort("S3"), LocalEV3.get().getPort("S4") };
+	private static final Port[] colorPort = { LocalEV3.get().getPort("S2"), LocalEV3.get().getPort("S3") };
 	// TODO
 
 	// Adjustable Variables
@@ -97,8 +97,6 @@ public class Initialization {
 		else if (buttonChoice == Button.ID_RIGHT) {
 			usPoller.start();
 			colorPoller.start();
-			TestField test = new TestField();
-			test.testSampleField(0);
 			
 
 		}

@@ -17,7 +17,9 @@ public class Field {
 			}
 		}
 	}
-	
+	public double getTileSize(){
+		return this.tileSize;
+	}
 	public void displayField(){
 		for(int i=this.yTiles-1;i>=0;i--){
 			for(int j=0;j<this.xTiles;j++){

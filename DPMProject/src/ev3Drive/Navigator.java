@@ -149,6 +149,14 @@ public class Navigator extends Thread {
 	public void turnDown() {
 		turnTo(270,true);
 	}
+	
+	public double getCurrentX(){
+		return odometer.getX();
+	}
+	
+	public double getCurrentY(){
+		return odometer.getY();
+	}
 
 	public void start() {
 		// Nothing needs to run here
