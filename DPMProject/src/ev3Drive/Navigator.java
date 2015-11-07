@@ -79,7 +79,7 @@ public class Navigator extends Thread {
 		minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX())) * (180.0 / Math.PI);
 		if (minAng < 0)
 			minAng += 360.0;
-		this.turnTo(minAng, false);
+		this.turnTo(minAng, true);
 		this.setSpeeds(FAST, FAST);
 		while (Math.abs(x - odometer.getX()) > CM_ERR || Math.abs(y - odometer.getY()) > CM_ERR) {
 			}
@@ -93,21 +93,23 @@ public class Navigator extends Thread {
 	public void turnTo(double angle, boolean stop) {
 
 		double error = angle - this.odometer.getAng();
+		
+		if (error < -180.0) {
+			this.setSpeeds(-SLOW, SLOW);
+		} else if (error < 0.0) {
+			this.setSpeeds(SLOW, -SLOW);
+		} else if (error > 180.0) {
+			this.setSpeeds(SLOW, -SLOW);
+		} else {
+			this.setSpeeds(-SLOW, SLOW);
+		}
 
 		while (Math.abs(error) > DEG_ERR) {
-
 			error = angle - this.odometer.getAng();
-
-			if (error < -180.0) {
-				this.setSpeeds(-SLOW, SLOW);
-			} else if (error < 0.0) {
-				this.setSpeeds(SLOW, -SLOW);
-			} else if (error > 180.0) {
-				this.setSpeeds(SLOW, -SLOW);
-			} else {
-				this.setSpeeds(-SLOW, SLOW);
-			}
 		}
+		
+		
+		
 
 		if (stop) {
 			this.setSpeeds(0, 0);
@@ -121,6 +123,23 @@ public class Navigator extends Thread {
 	public void goForward(double distance) {
 		this.travelTo(Math.cos(Math.toRadians(this.odometer.getAng())) * distance, Math.cos(Math.toRadians(this.odometer.getAng())) * distance);
 
+	}
+	
+	
+	public void turnUp (){
+		turnTo(90,true);
+	}
+	
+	public void turnRight() {
+		turnTo(0,true);
+	}
+	
+	public void turnLeft() {
+		turnTo(180,true);
+	}
+	
+	public void turnDown() {
+		turnTo(270,true);
 	}
 
 	public void start() {

@@ -45,10 +45,9 @@ public class LCDInfo implements TimerListener{
 		LCD.drawString("X: "+ pos[0], 0, 0);
 		LCD.drawString("Y: "+pos[1], 0, 1);
 		LCD.drawString("H: "+pos[2], 0, 2);
-		LCD.drawString("US1 Distance: " + usPoller.getDistanceOf(0), 0, 3 );	// print last US reading
-		LCD.drawString("US2 Distance: " + usPoller.getDistanceOf(1), 0, 4 );	// print last US reading
-		LCD.drawString("CS1 Reading: " + colorPoller.getReadingOf(0), 0, 5 );	// print last color reading
-		LCD.drawString("CS2 Reading: " + colorPoller.getReadingOf(1), 0, 6 );	// print last color reading
+		LCD.drawString("US1 Distance: " + usPoller.getDistance(), 0, 3 );	// print last US reading
+		LCD.drawString("CS1 Reading: " + colorPoller.getReadingOf(0), 0, 4 );	// print last color reading
+		LCD.drawString("CS2 Reading: " + colorPoller.getReadingOf(1), 0, 5 );	// print last color reading
 		
 //		if (objectPoller.isThereObject == 0) {
 //			LCD.drawString("No Object Detected", 0, 5 );
