@@ -1,19 +1,14 @@
 package Game;
 
-import ev3Sensors.FilteredUltrasonicPoller;
 import FieldMap.*;
 
 public class Game {
 	private Field myField;
 	private Robot myRobot;
-	private Navigator navigator;
-	private FilteredUltrasonicPoller USpoller;
 	
-	public Game(Robot myRobot,Field myField, Navigator navigator, FilteredUltrasonicPoller USpoller){
+	public Game(Robot myRobot,Field myField){
 		this.myField= myField;
 		this.myRobot= myRobot;
-		this.navigator=navigator; 
-		this.USpoller= USpoller;
 	}
 	public void moveRobot(int tileX, int tileY){
 		int robotTileX= (int) ((int) this.myRobot.getPosition().getPositionX()/this.myField.getTileSize());
@@ -58,32 +53,11 @@ public class Game {
 		this.myField.getTile(nextTileX, nextTileY).setBlock(Block.BLOCKED);
 	}
 	
-	public boolean attemptTask(Task t){
+//	public boolean attemptTask(Task t){
 	//update the robot's position
-		switch(t){
-		case MOVEUP: this.navigator.turnUp();
-					 break;
-		case MOVEDOWN: this.navigator.turnDown();
-					   break;
-		case MOVERIGHT: this.navigator.turnRight();
-						break;
-		case MOVELEFT:  this.navigator.turnLeft();
-						break;
-		}
-		Thread.sleep(2000);
-		float usDist= USpoller.getDistance();
-		if(usDist<0.25){
-			return false;
-		}
-		this.navigator.goForwardHalfTile(this.myField.getTileSize());
-		Thread.sleep(2000);
-		usDist= USpoller.getDistance();
-		if(usDist<0.25){
-			return false;
-		}
-		return true;
-		
-	}
+//		switch (t):
+//			case Task.MOVEUP:
+//	}
 	
 
 }
