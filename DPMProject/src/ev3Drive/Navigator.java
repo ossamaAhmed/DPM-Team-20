@@ -125,6 +125,14 @@ public class Navigator extends Thread {
 
 	}
 	
+	public void goForwardOneTile(double tileSize){
+		goForward(tileSize);
+	}
+	
+	public void goForwardHalfTile(double tileSize){
+		goForward(0.5*tileSize);
+		
+	}
 	
 	public void turnUp (){
 		turnTo(90,true);
