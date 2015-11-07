@@ -76,14 +76,12 @@ public class Game {
 			return false;
 		}
 		this.navigator.goForwardHalfTile(this.myField.getTileSize());
-		this.myRobot.setPosition(new Position(this.navigator.getCurrentX(),this.navigator.getCurrentY()));
 		Thread.sleep(2000);
 		usDist= USpoller.getDistance();
 		if(usDist<0.25){
 			return false;
 		}
 		this.navigator.goForwardHalfTile(this.myField.getTileSize());
-		this.myRobot.setPosition(new Position(this.navigator.getCurrentX(),this.navigator.getCurrentY()));
 		return true;
 		
 	}
