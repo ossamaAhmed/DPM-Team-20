@@ -35,6 +35,7 @@ public class Navigator extends Thread {
 	 * Functions to set the motor speeds jointly
 	 */
 	public void setSpeeds(float lSpd, float rSpd) {
+		//rSpd=rSpd+0.5f;
 		this.leftMotor.setSpeed(lSpd);
 		this.rightMotor.setSpeed(rSpd);
 		if (lSpd < 0)
@@ -48,6 +49,7 @@ public class Navigator extends Thread {
 	}
 
 	public void setSpeeds(int lSpd, int rSpd) {
+		//float riSpd=rSpd+0.5f;
 		this.leftMotor.setSpeed(lSpd);
 		this.rightMotor.setSpeed(rSpd);
 		if (lSpd < 0)

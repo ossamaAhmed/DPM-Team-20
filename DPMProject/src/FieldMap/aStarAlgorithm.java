@@ -1,10 +1,30 @@
 package FieldMap;
-
+/*
+ * File: aStarAlgorithm.java
+ * Written by: Ossama Ahmed
+ * ECSE 211 - Design Principles and Methods
+ * Fall 2015
+ * aStarAlgorithm class provides the methods used in the path finding and navigating of the robot
+ */
 import java.util.ArrayList;
 import java.util.Stack;
 
 public class aStarAlgorithm {
 	
+	/**
+	 * Path finding algorithm for the robot, using a* search. It does this
+	 * by evaluating each frontier cell and picking the best candidate. Each
+	 * frontier cell gets placed into ArrayList openSet, while searched
+	 * tiles are put into ArrayList closedSet. Cells with obstacles are
+	 * put into ArrayList obstacles. Repeats these two steps until it
+	 * finds the destination tile.
+	 * @param myMap is the 2D tile map that the robot navigates in
+	 * @param xStart is the x index where the robot is 
+	 * @param yStart is the y index where the robot is 
+	 * @param xEnd is the x index of the destination tile
+	 * @param yEnd is the y index of the destination tile 
+	 * @return it returns a task list to the robot to reach it's destination
+	 */
 	public static Task[] aStar(Tile[][] myMap, int xStart,int yStart, int xEnd, int yEnd) {
 		
 		ArrayList<Tile> openSet = new ArrayList<Tile>();
@@ -112,8 +132,16 @@ public class aStarAlgorithm {
 		}
 		return null;
 	}
-
-
+	/**
+	 * Method which returns the route of the path leading to the destination tile. Does
+	 * this by taking the last cell, where the destination tile is located and repeatedly
+	 * calling the parent cell until it reached the original robot's position.
+	 * While calling the parent cell it notes which direction it need to travel
+	 * from parent to child cell, storing it into a stack and finally
+	 * transferring it into an Task array.
+	 * @param cell is the destination tile
+	 * @return it returns a task list to the robot to reach it's destination
+	 */
 	private static Task[] returnRoute(Tile cell) {
 		Tile currentCell = cell;
 		Tile parent = currentCell.getParent();
@@ -147,7 +175,12 @@ public class aStarAlgorithm {
 		return route;
 	}
 
-
+	/**
+	 * Searches through all the tiles in the open set of tiles, and get the tile
+	 * with the lowest search algorithm score possible.
+	 * @param openSet the tiles that haven't been searched through yet in the path finding algorithm
+	 * @return the tile with the best score to reach the destination tile.
+	 */
 	private static Tile getMinCell(ArrayList<Tile> openSet) {
 		Tile smallest = openSet.get(0);
 		for (int i = 1; i < openSet.size(); i++) {
@@ -157,7 +190,11 @@ public class aStarAlgorithm {
 
 		return smallest;
 	}
-
+	/**
+	 * Checks whether or not the tile in question has an obstacle
+	 * @param cell current tile being searched in the path finding algorithm
+	 * @return boolean whether or not there is an obstacle in the tile
+	 */
 
 	private static boolean getObstacle(Tile cell) {
 		if (cell.getBlock()==Block.BLOCKED) {
@@ -166,8 +203,15 @@ public class aStarAlgorithm {
 			return false;
 		}
 	}
-
-
+	/**
+	 * Takes future x and y tile indices of the robot and returns the Manhattan
+	 * distance to the destination tile.
+	 * @param cellPosX the robot's tile x index
+	 * @param cellPosY the robot's tile y index
+	 * @param endPosX the destination's tile x index
+	 * @param endPosY the destination's tile y index
+	 * @return Manhattan distance used in path finding algorithm.
+	 */
 	private static int manhattan(Tile[][] myMap, int cellPosX, int cellPosY, int endPosX, int endPosY) {
 		int dX = Math.abs(cellPosX- endPosX);
 		int dY = Math.abs(cellPosY- endPosY);

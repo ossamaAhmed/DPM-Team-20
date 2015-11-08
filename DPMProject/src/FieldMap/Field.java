@@ -1,11 +1,26 @@
 package FieldMap;
-
+/*
+ * File: Field.java
+ * Written by: Ossama Ahmed
+ * ECSE 211 - Design Principles and Methods
+ * Fall 2015
+ * Field class represents the physical map (NxM) matrix 
+ */
 public class Field {
+	
+	/* Instance Variables*/
 	private Tile[][] Map;
 	private double tileSize;
 	private int xTiles;
 	private int yTiles;
 	
+	/** 
+	 * Constructor
+	 * This method takes care of initializing the field object 
+	 * @param xTiles is the number of tiles in the x coordinate 
+	 * @param yTiles is the number of tiles in the y coordinate 
+	 * @param tileSize is the size of the physical tile
+	 */
 	public Field(int xTiles, int yTiles,double tileSize ){
 		this.xTiles= xTiles;
 		this.yTiles= yTiles;
@@ -17,9 +32,16 @@ public class Field {
 			}
 		}
 	}
+	/** 
+	 * This method takes care of getting the tile size of a tile in the field 
+	 * @return it returns the tile size of the physical tile
+	 */
 	public double getTileSize(){
 		return this.tileSize;
 	}
+	/** 
+	 * This method can be used in debugging the field by displaying the field on the console 
+	 */
 	public void displayField(){
 		for(int i=this.yTiles-1;i>=0;i--){
 			for(int j=0;j<this.xTiles;j++){
@@ -33,13 +55,30 @@ public class Field {
 			System.out.println("");
 		}
 	}
-	
+	/** 
+	 * This method takes care of setting a tile instead of an already existing tile in the x and y location
+	 * @param newTile is the tile that you want to insert in the field
+	 * @param x is the x index of the tile to be replaced
+	 * @param y is the y index of the tile to be replaced
+	 */
 	public void setTile(Tile newTile,int x,int y){
 		this.Map[x][y]=newTile;
 	}
+	/** 
+	 * This method takes care of getting a tile at the x and y indices 
+	 * @param x is the x index of the tile you want to get
+	 * @param y is the y index of the tile you want to get
+	 * @return it returns the tile at the x and y locations
+	 */
 	public Tile getTile(int x,int y){
 		return this.Map[x][y];
 	}
+	/** 
+	 * This method takes care of getting the list of the neighboring tiles to a specific tile
+	 * @param x is the x index of the tile you want to get it's neighbors
+	 * @param y is the y index of the tile you want to get it's neighbors
+	 * @return it returns a list of tiles of the neighboring tiles (north, south, east, west)
+	 */
 	public Tile[] getNeighbouringTiles(int x,int y){
 		Tile[] neighbouringTiles= new Tile[4];
 		//getting the upper tile 
@@ -72,6 +111,10 @@ public class Field {
 		}
 		return neighbouringTiles;
 	}
+	/** 
+	 * This method takes care of getting the tiles 2D array
+	 * @return it returns the 2D tile array
+	 */
 	public Tile[][] getTiles(){
 		return this.Map;
 	}

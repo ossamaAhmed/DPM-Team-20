@@ -1,3 +1,11 @@
+/*
+ * File: TestField.java
+ * Written by: Ossama Ahmed
+ * ECSE 211 - Design Principles and Methods
+ * Fall 2015
+ * TestField class is a temporary class used to test the logic of the shortest path algorithm 
+ * and the obstacle avoidance algorithm
+ */
 package FieldMap;
 
 public class TestField {

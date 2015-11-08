@@ -23,7 +23,7 @@ public class Initialization {
 	// Static Resources:
 	// TODO
 	private static final EV3LargeRegulatedMotor[] drivingMotor = { new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A")), new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D")) };
-	private static final EV3LargeRegulatedMotor[] armMotor = { new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C")), new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B")) };
+//	private static final EV3LargeRegulatedMotor[] armMotor = { new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C")), new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B")) };
 	private static final Port usPort = LocalEV3.get().getPort("S1");
 	private static final Port[] colorPort = { LocalEV3.get().getPort("S2"), LocalEV3.get().getPort("S3") };
 	// TODO
@@ -105,29 +105,29 @@ public class Initialization {
 		// Up Button
 		else if (buttonChoice == Button.ID_UP) {
 			// Float motors and start sensors for debugging
-			usPoller.start();
-			colorPoller.start();
-			objectPoller.start();
-			ObjectSearch objectSearch = new ObjectSearch(odo, objectPoller, usPoller);
-			LCDInfo lcd = new LCDInfo(odo, usPoller, colorPoller, objectPoller, objectSearch);
-			ArmController arm = new ArmController(armMotor);
-			for (int i = 0; i < 2; i++) {
-				drivingMotor[i].forward();
-				drivingMotor[i].flt();
-			}
-			// Press enter to set both arms to zero, press up to set both arms to armAngle
-			while (buttonChoice != Button.ID_ENTER) {
-
-			}
-			// Raise both arm 0 and 1 to 0 degrees
-			arm.raiseArm(0);
-			arm.raiseArm(1);
-			while (buttonChoice != Button.ID_UP) {
-
-			}
-			// Drop both arm 0 and 1 to armAngle
-			arm.dropArm(0);
-			arm.dropArm(1);
+//			usPoller.start();
+//			colorPoller.start();
+//			objectPoller.start();
+//			ObjectSearch objectSearch = new ObjectSearch(odo, objectPoller, usPoller);
+//			LCDInfo lcd = new LCDInfo(odo, usPoller, colorPoller, objectPoller, objectSearch);
+//			ArmController arm = new ArmController(armMotor);
+//			for (int i = 0; i < 2; i++) {
+//				drivingMotor[i].forward();
+//				drivingMotor[i].flt();
+//			}
+//			// Press enter to set both arms to zero, press up to set both arms to armAngle
+//			while (buttonChoice != Button.ID_ENTER) {
+//
+//			}
+//			// Raise both arm 0 and 1 to 0 degrees
+//			arm.raiseArm(0);
+//			arm.raiseArm(1);
+//			while (buttonChoice != Button.ID_UP) {
+//
+//			}
+//			// Drop both arm 0 and 1 to armAngle
+//			arm.dropArm(0);
+//			arm.dropArm(1);
 		}
 
 		// Down Button
@@ -165,14 +165,18 @@ public class Initialization {
 //				nav.travelTo(60,60);
 //				nav.travelTo(0, 60);
 //				nav.travelTo(0, 0);
-				double[] newpos= {15,15,0};
-				boolean[] newbol= {true,true,true};
-
-				odo.setPosition(newpos, newbol);
-				Robot myRobot= new Robot(new Position(15,15));
-				Field myField= new Field(3,12,30);
-				Game myGame= new Game(myRobot,myField, nav, usPoller);
-				myGame.moveRobot(2, 5);
+			
+			
+			
+				nav.travelTo(150, 0);
+//				double[] newpos= {15,15,0};
+//				boolean[] newbol= {true,true,true};
+//				
+//				odo.setPosition(newpos, newbol);
+//				Robot myRobot= new Robot(new Position(15,15));
+//				Field myField= new Field(3,12,30);
+//				Game myGame= new Game(myRobot,myField, nav, usPoller);
+//				myGame.moveRobot(2, 9);
 
 		}
 
