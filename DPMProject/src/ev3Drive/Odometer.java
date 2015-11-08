@@ -31,6 +31,19 @@ import lejos.utility.Timer;
 import lejos.utility.TimerListener;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
+/**
+ * This class is responsible for updating the robot's
+ * current x,y and theta position
+ *
+ */
+/**
+ * @author rick
+ *
+ */
+/**
+ * @author rick
+ *
+ */
 public class Odometer implements TimerListener {
 
 	private Timer timer;
@@ -41,6 +54,12 @@ public class Odometer implements TimerListener {
 	private double[] oldDH, dDH;
 	
 	// constructor
+	/**
+	 * @param leftMotor The left driving motor
+	 * @param rightMotor The right driving motor
+	 * @param INTERVAL The time between each update of the odometer
+	 * @param autostart If true, the odometer will start when initialized
+	 */
 	public Odometer (EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor, int INTERVAL, boolean autostart) {
 		
 		this.leftMotor = leftMotor;
@@ -66,10 +85,17 @@ public class Odometer implements TimerListener {
 	}
 	
 	// functions to start/stop the timerlistener
+	/**
+	 * This method stops the odometer polling
+	 * 
+	 */
 	public void stop() {
 		if (this.timer != null)
 			this.timer.stop();
 	}
+	/**
+	 * This method starts the odometer polling
+	 */
 	public void start() {
 		if (this.timer != null)
 			this.timer.start();
@@ -77,6 +103,10 @@ public class Odometer implements TimerListener {
 	
 	/*
 	 * Calculates displacement and heading as title suggests
+	 */
+	/**This method calculates the change in displacement and heading
+	 * between the last tachometer polling
+	 * @param data The change in x,y, and theta are returned in this array
 	 */
 	private void getDisplacementAndHeading(double[] data) {
 		int leftTacho, rightTacho;
@@ -89,6 +119,10 @@ public class Odometer implements TimerListener {
 	
 	/*
 	 * Recompute the odometer values using the displacement and heading changes
+	 */
+	/**
+	 * This method is called every poll of the odometer and is responsible for updating
+	 * the displacemet and heading
 	 */
 	public void timedOut() {
 		this.getDisplacementAndHeading(dDH);
@@ -109,6 +143,10 @@ public class Odometer implements TimerListener {
 	}
 
 	// return X value
+	/**
+	 * This is the getter method for the X coordinate
+	 * @return The current odometer X value
+	 */
 	public double getX() {
 		synchronized (this) {
 			return x;
@@ -116,6 +154,10 @@ public class Odometer implements TimerListener {
 	}
 
 	// return Y value
+	/**
+	 * This is the getter method for the Y coordinate
+	 * @return The current odometer Y value
+	 */
 	public double getY() {
 		synchronized (this) {
 			return y;
@@ -123,6 +165,10 @@ public class Odometer implements TimerListener {
 	}
 
 	// return theta value
+	/**
+	 * This is the getter method for the heading in degrees
+	 * @return The current heading
+	 */
 	public double getAng() {
 		synchronized (this) {
 			return theta;
@@ -130,6 +176,12 @@ public class Odometer implements TimerListener {
 	}
 
 	// set x,y,theta
+	/**
+	 * The setter method for x,y, and theta
+	 * @param position An array corresponding to the new x,y, and theta values
+	 * @param update An array of booleans corresponding to if the respective
+	 * positions should be updated
+	 */
 	public void setPosition(double[] position, boolean[] update) {
 		synchronized (this) {
 			if (update[0])
@@ -142,6 +194,11 @@ public class Odometer implements TimerListener {
 	}
 
 	// return x,y,theta
+	/**
+	 * Getter method for the current robot position
+	 * @param position An array corresponding to the x,y,and theta (degrees) values
+	 * respectively
+	 */
 	public void getPosition(double[] position) {
 		synchronized (this) {
 			position[0] = x;
@@ -149,6 +206,12 @@ public class Odometer implements TimerListener {
 			position[2] = theta;
 		}
 	}
+	
+	/**
+	 * Getter method for the current robot position
+	 * @param position An array corresponding to the x,y,and theta (degrees) values
+	 * respectively
+	 */
 
 	public double[] getPosition() {
 		synchronized (this) {
@@ -156,22 +219,44 @@ public class Odometer implements TimerListener {
 		}
 	}
 	
+	
+	/**
+	 * Setter method for the robot heading
+	 * @param newAngle The desired new heading in degrees
+	 */
 	public void setAng(double newAngle){
 		this.theta = fixDegAngle(newAngle);
 	}
 	
 	// accessors to motors
+	/**
+	 * Getter method for both motors
+	 * @return The motors in an array
+	 */
 	public EV3LargeRegulatedMotor [] getMotors() {
 		return new EV3LargeRegulatedMotor[] {this.leftMotor, this.rightMotor};
 	}
+	/**
+	 * Getter method for the left motor
+	 * @return The left motor
+	 */
 	public EV3LargeRegulatedMotor getLeftMotor() {
 		return this.leftMotor;
 	}
+	/**
+	 * Getter method for the right motor
+	 * @return The right motor
+	 */
 	public EV3LargeRegulatedMotor getRightMotor() {
 		return this.rightMotor;
 	}
 
 	// static 'helper' methods
+	/**
+	 * Helper method which wraps the angle from 0 to 360 degrees
+	 * @param angle The angle to correct
+	 * @return The corrected angle
+	 */
 	public static double fixDegAngle(double angle) {
 		if (angle < 0.0)
 			angle = 360.0 + (angle % 360.0);
@@ -179,6 +264,13 @@ public class Odometer implements TimerListener {
 		return angle % 360.0;
 	}
 
+	/**
+	 * Helper method to get the shortest distance between two angles
+	 * @param a The first angle
+	 * @param b The second angle
+	 * @return The shortest rotation to travel from the first angle
+	 * to the second angle (-180 to 180 degrees)
+	 */
 	public static double minimumAngleFromTo(double a, double b) {
 		double d = fixDegAngle(b - a);
 

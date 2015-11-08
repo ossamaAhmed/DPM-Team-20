@@ -5,6 +5,12 @@ import ev3Drive.Odometer;
 import ev3Sensors.FilteredUltrasonicPoller;
 import lejos.hardware.Sound;
 
+/**
+ * This class is responsible for executing falling edge and rising edge
+ * localization and updating the x,y, and theta values afterwards
+ * @author rick
+ *
+ */
 public class USLocalizer {
 	public enum LocalizationType {
 		FALLING_EDGE, RISING_EDGE
@@ -23,6 +29,11 @@ public class USLocalizer {
 
 	//
 
+	/**
+	 * @param odo The odometer to update and read
+	 * @param usPoller The ultrasonic data to read
+	 * @param locType The choice between rising edge and fallng edge
+	 */
 	public USLocalizer(Odometer odo, FilteredUltrasonicPoller usPoller, LocalizationType locType) {
 		this.odo = odo;
 		this.locType = locType;
@@ -31,6 +42,10 @@ public class USLocalizer {
 		nav.start();
 	}
 
+	/**
+	 * This method performs either the falling edge or rising edge localization
+	 * and then updates the position information
+	 */
 	public void doLocalization() {
 		double[] angles = new double[3]; // Angle A = 0, Angle B = 1, New Heading = 2
 
@@ -53,6 +68,10 @@ public class USLocalizer {
 		nav.setSpeeds(0, 0);
 	}
 
+	/**
+	 * Helper method which checks if the robot is facing the wall
+	 * @return Boolean corresponding to if the robot is facing the wall or not
+	 */
 	private int facingWall() {
 		// 1 = True, 0 = False , 2 = Don't know
 		float d = usPoller.getDistance();
@@ -64,6 +83,11 @@ public class USLocalizer {
 		return facingWall;
 	}
 
+	/**
+	 * This method executes the rising edge localization algorithm and returns
+	 * the calculated angle between the walls
+	 * @return The calculated angle between the detected walls
+	 */
 	private double[] doRisingEdge() {
 		double[] angles = new double[3];
 		nav.setSpeeds(ROTATION_SPEED, -1 * ROTATION_SPEED);
@@ -85,6 +109,12 @@ public class USLocalizer {
 		return angles;
 	}
 
+	
+	/**
+	 * This method executes the falling edge localization algorithm and returns
+	 * the calculated angle between the walls
+	 * @return The calculated angle between the detected walls
+	 */
 	private double[] doFallingEdge() {
 		double angleA, angleB;
 		double[] angles = new double[3];
@@ -108,6 +138,13 @@ public class USLocalizer {
 
 	}
 
+	
+	/**
+	 * Helper method which returns the shortest distance between angles a and b in degrees
+	 * @param a The first angle
+	 * @param b The second angle
+	 * @return The shortest distance between angle a and b (-180 to 180 degrees)
+	 */
 	public double getAngleDistance(double a, double b) {
 		// Given a and b, find the minimum distance between a and b (in degrees)
 		// while accounting for angle wrapping

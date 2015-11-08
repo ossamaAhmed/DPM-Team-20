@@ -24,6 +24,15 @@ public class LCDInfo implements TimerListener{
 	// arrays for displaying data
 	private double [] pos;
 	
+	/**
+	 * A class which is responsible for displaying the robot's 
+	 * current sensor and odometer readings
+	 * @param odo The odometer to display
+	 * @param usPoller The ultrasonic reading to display
+	 * @param colorPoller The color sensor reading to display
+	 * @param objectPoller The objection identification reading to display
+	 * @param objectSearch The object search reading to display
+	 */
 	public LCDInfo(Odometer odo, FilteredUltrasonicPoller usPoller, FilteredColorPoller colorPoller, ObjectPoller objectPoller, ObjectSearch objectSearch ) {
 		this.odo = odo;
 		this.lcdTimer = new Timer(LCD_REFRESH, this);
@@ -39,6 +48,10 @@ public class LCDInfo implements TimerListener{
 		lcdTimer.start();
 	}
 	
+	/**
+	 * This method is called everytime the LCD is updated and is responsible
+	 * for updating the current readings on the screen
+	 */
 	public void timedOut() { 
 		odo.getPosition(pos);
 		LCD.clear();

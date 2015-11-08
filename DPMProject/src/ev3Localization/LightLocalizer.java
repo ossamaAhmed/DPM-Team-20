@@ -4,6 +4,12 @@ import ev3Drive.*;
 import lejos.hardware.Sound;
 import lejos.robotics.SampleProvider;
 
+/**
+ * This class is responsible completing light localization and correcting
+ * the x,y and theta position
+ * @author rick
+ *
+ */
 public class LightLocalizer {
 	// Resources
 	private Odometer odo;
@@ -20,6 +26,11 @@ public class LightLocalizer {
 	public static float ROTATION_SPEED = 75;
 	private double intersectionAngles[] = { 0, 0, 0, 0, 0 };
 
+	/**
+	 * @param odo The odometer to be updated and used for localization logic
+	 * @param colorSource The color sensor to be polled for data
+	 * @param colorData The data from the polled sensor
+	 */
 	public LightLocalizer(Odometer odo, SampleProvider colorSource, float[] colorData) {
 		this.odo = odo;
 		this.colorSource = colorSource;
@@ -28,6 +39,10 @@ public class LightLocalizer {
 		nav.start();
 	}
 
+	/**
+	 * This method executes the light localization algorithim
+	 * and then updates the x,y, and theta values afterwards
+	 */
 	public void doLocalization() {
 		// Travel to starting position and face south
 		//nav.travelTo(xStart, yStart);
@@ -61,6 +76,12 @@ public class LightLocalizer {
 
 	}
 
+	/**
+	 * Helper method which returns the shortest distance between angles a and b in degrees
+	 * @param a The first angle
+	 * @param b The second angle
+	 * @return The shortest distance between angle a and b (-180 to 180 degrees)
+	 */
 	public double getAngleDistance(double a, double b) {
 		// Given a and b, find the minimum distance between a and b (in degrees)
 		// while accounting for angle wrapping
