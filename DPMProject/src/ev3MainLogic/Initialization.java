@@ -14,21 +14,23 @@ import lejos.hardware.lcd.TextLCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.port.Port;
 import lejos.hardware.sensor.*;
+import FieldMap.*;
+import Game.Game;
 
 
 public class Initialization {
 
 	// Static Resources:
 	// TODO
-	private static final EV3LargeRegulatedMotor[] drivingMotor = { new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A")), new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B")) };
-	private static final EV3LargeRegulatedMotor[] armMotor = { new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C")), new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D")) };
-	private static final Port[] usPort = { LocalEV3.get().getPort("S1"), LocalEV3.get().getPort("S2") };
-	private static final Port[] colorPort = { LocalEV3.get().getPort("S3"), LocalEV3.get().getPort("S4") };
+	private static final EV3LargeRegulatedMotor[] drivingMotor = { new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A")), new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D")) };
+	private static final EV3LargeRegulatedMotor[] armMotor = { new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C")), new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B")) };
+	private static final Port usPort = LocalEV3.get().getPort("S1");
+	private static final Port[] colorPort = { LocalEV3.get().getPort("S2"), LocalEV3.get().getPort("S3") };
 	// TODO
 
 	// Adjustable Variables
-	private static final float[] maxUltrasonicReading = { 2.00f, 2.00f }; // Max value for us clipping filter
-	private static final int[] usReadingsToMedian = { 5, 5 };
+	private static final float maxUltrasonicReading = 2.00f; // Max value for us clipping filter
+	private static final int usReadingsToMedian = 5;
 	private static final int[] colorReadingsToMedian = { 5, 5 };
 
 	//
@@ -37,10 +39,8 @@ public class Initialization {
 
 		int buttonChoice = 0;
 		// Ultrasonic Sensor Initialization
-		SensorModes usSensor[] = new SensorModes[2];
-		for (int i = 0; i < 2; i++) {
-			usSensor[i] = new EV3UltrasonicSensor(usPort[i]);
-		}
+		SensorModes usSensor = new EV3UltrasonicSensor(usPort);
+
 		FilteredUltrasonicPoller usPoller = new FilteredUltrasonicPoller(usSensor, maxUltrasonicReading, usReadingsToMedian);
 		//
 
@@ -75,6 +75,9 @@ public class Initialization {
 		}
 
 		while (buttonChoice != Button.ID_LEFT && buttonChoice != Button.ID_RIGHT && buttonChoice != Button.ID_UP && buttonChoice != Button.ID_DOWN);
+		{
+			
+		}
 
 		// Left Button
 		if (buttonChoice == Button.ID_LEFT) {
@@ -93,22 +96,9 @@ public class Initialization {
 
 		// Right Button
 		else if (buttonChoice == Button.ID_RIGHT) {
-			//TODO
-
-			// perform the ultrasonic localization with rising edge
-			// usPoller.start();
-			// colorPoller.start();
-			// objectPoller.start();
-			//
-			// USLocalizer usl = new USLocalizer(odo, usPoller, USLocalizer.LocalizationType.RISING_EDGE);
-			// usl.doLocalization();
-			// ObjectSearch objectSearch = new ObjectSearch(odo,objectPoller,usPoller);
-			//
-			// LCDInfo lcd = new LCDInfo(odo, usPoller,colorPoller,objectPoller , objectSearch);
-
-			//
-			// LightLocalizer lsl = new LightLocalizer(odo, colorFilteredSource, colorData);
-			// lsl.doLocalization();
+			usPoller.start();
+			colorPoller.start();
+			
 
 		}
 
@@ -156,13 +146,33 @@ public class Initialization {
 			LCDInfo lcd = new LCDInfo(odo, usPoller, colorPoller, objectPoller, objectSearch);
 			Navigator nav = new Navigator(odo);
 			// Press enter to do square drive
-			while (buttonChoice != Button.ID_ENTER) {
-				nav.travelTo(60, 0);
-				nav.travelTo(60,60);
-				nav.travelTo(0, 60);
-				nav.travelTo(0, 0);
+//				drivingMotor[0].setSpeed(50);
+//				drivingMotor[1].setSpeed(50);
+//				drivingMotor[0].forward();
+//				drivingMotor[1].forward();
+//				try {
+//					Thread.sleep(3000);
+//				} catch (InterruptedException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//				nav.travelTo(60, 0);
+//				drivingMotor[0].setSpeed(0);
+//				drivingMotor[1].setSpeed(0);
+//				drivingMotor[0].forward();
+//				drivingMotor[1].forward();
 
-			}
+//				nav.travelTo(60,60);
+//				nav.travelTo(0, 60);
+//				nav.travelTo(0, 0);
+				double[] newpos= {15,15,0};
+				boolean[] newbol= {true,true,true};
+
+				odo.setPosition(newpos, newbol);
+				Robot myRobot= new Robot(new Position(15,15));
+				Field myField= new Field(3,12,30);
+				Game myGame= new Game(myRobot,myField, nav, usPoller);
+				myGame.moveRobot(2, 5);
 
 		}
 

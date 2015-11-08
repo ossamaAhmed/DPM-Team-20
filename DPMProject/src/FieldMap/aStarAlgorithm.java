@@ -6,6 +6,7 @@ import java.util.Stack;
 public class aStarAlgorithm {
 	
 	public static Task[] aStar(Tile[][] myMap, int xStart,int yStart, int xEnd, int yEnd) {
+		
 		ArrayList<Tile> openSet = new ArrayList<Tile>();
 		ArrayList<Tile> closedSet = new ArrayList<Tile>();
 		ArrayList<Tile> obstacles = new ArrayList<Tile>();
@@ -138,6 +139,11 @@ public class aStarAlgorithm {
 
 			route[i] = temp.pop();
 		}
+		System.out.print("The path generated is ");
+		for(int i=0;i<route.length;i++){
+			System.out.print(route[i]);
+		}
+		System.out.println("");
 		return route;
 	}
 

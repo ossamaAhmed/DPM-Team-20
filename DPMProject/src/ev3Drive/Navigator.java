@@ -15,7 +15,7 @@ public class Navigator extends Thread {
 	final int FAST = 200;
 	final int SLOW = 50;
 	static final int ACCELERATION = 1500;
-	final static double DEG_ERR = 2.0, CM_ERR = 0.75;
+	final static double DEG_ERR = 2.0, CM_ERR = 1.5;
 	private Odometer odometer;
 	private EV3LargeRegulatedMotor leftMotor, rightMotor;
 
@@ -79,9 +79,15 @@ public class Navigator extends Thread {
 		minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX())) * (180.0 / Math.PI);
 		if (minAng < 0)
 			minAng += 360.0;
-		this.turnTo(minAng, false);
+		this.turnTo(minAng, true);
 		this.setSpeeds(FAST, FAST);
-		while (Math.abs(x - odometer.getX()) > CM_ERR || Math.abs(y - odometer.getY()) > CM_ERR) {
+		double dx=x - odometer.getX();
+		double dy= y - odometer.getY();
+		double distance= Math.sqrt(Math.pow(dx, 2)+Math.pow(dy, 2));
+		while (distance > CM_ERR ) {
+			dx=x - odometer.getX();
+			dy= y - odometer.getY();
+			distance= Math.sqrt(Math.pow(dx, 2)+Math.pow(dy, 2));
 			}
 		this.setSpeeds(0, 0);
 	}
@@ -93,11 +99,11 @@ public class Navigator extends Thread {
 	public void turnTo(double angle, boolean stop) {
 
 		double error = angle - this.odometer.getAng();
+		
+	
 
 		while (Math.abs(error) > DEG_ERR) {
-
 			error = angle - this.odometer.getAng();
-
 			if (error < -180.0) {
 				this.setSpeeds(-SLOW, SLOW);
 			} else if (error < 0.0) {
@@ -108,7 +114,6 @@ public class Navigator extends Thread {
 				this.setSpeeds(-SLOW, SLOW);
 			}
 		}
-
 		if (stop) {
 			this.setSpeeds(0, 0);
 		}
@@ -119,8 +124,41 @@ public class Navigator extends Thread {
 	 * Go foward a set distance in cm
 	 */
 	public void goForward(double distance) {
-		this.travelTo(Math.cos(Math.toRadians(this.odometer.getAng())) * distance, Math.cos(Math.toRadians(this.odometer.getAng())) * distance);
+		this.travelTo(odometer.getX()+ Math.cos(Math.toRadians(this.odometer.getAng())) * distance,odometer.getY()+ Math.sin(Math.toRadians(this.odometer.getAng())) * distance);
 
+	}
+	
+	public void goForwardOneTile(double tileSize){
+		goForward(tileSize);
+	}
+	
+	public void goForwardHalfTile(double tileSize){
+		goForward(0.5*tileSize);
+		
+	}
+	
+	public void turnUp (){
+		turnTo(90,true);
+	}
+	
+	public void turnRight() {
+		turnTo(0,true);
+	}
+	
+	public void turnLeft() {
+		turnTo(180,true);
+	}
+	
+	public void turnDown() {
+		turnTo(270,true);
+	}
+	
+	public double getCurrentX(){
+		return odometer.getX();
+	}
+	
+	public double getCurrentY(){
+		return odometer.getY();
 	}
 
 	public void start() {

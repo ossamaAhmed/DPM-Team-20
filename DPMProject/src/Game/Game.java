@@ -1,7 +1,9 @@
 package Game;
 
+import lejos.hardware.Sound;
 import ev3Sensors.FilteredUltrasonicPoller;
 import FieldMap.*;
+import ev3Drive.Navigator;
 
 public class Game {
 	private Field myField;
@@ -16,18 +18,31 @@ public class Game {
 		this.USpoller= USpoller;
 	}
 	public void moveRobot(int tileX, int tileY){
+		this.myField.displayField();
 		int robotTileX= (int) ((int) this.myRobot.getPosition().getPositionX()/this.myField.getTileSize());
 		int robotTileY= (int) ((int) this.myRobot.getPosition().getPositionY()/this.myField.getTileSize());
 
 		Task[]path= aStarAlgorithm.aStar(myField.getTiles(), robotTileX,robotTileY, tileX,tileY);
 		for(int i=0;i< path.length;i++){
 			//update the robot's position
-			robotTileX= (int) ((int) this.myRobot.getPosition().getPositionX()/this.myField.getTileSize());
-			robotTileY= (int) ((int) this.myRobot.getPosition().getPositionY()/this.myField.getTileSize());
+			try {
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			robotTileX= (int) (this.myRobot.getPosition().getPositionX()/this.myField.getTileSize());
+			robotTileY= (int) (this.myRobot.getPosition().getPositionY()/this.myField.getTileSize());
 			Task currentTask= path[i];
+			System.out.println("Timmy: my Current positionX"+this.myRobot.getPosition().getPositionX()+"tileX is "+ robotTileX+ " and my current positionY is "+this.myRobot.getPosition().getPositionY()+" tileY is "+ robotTileY+ ", I am attempting to preform "+currentTask);
+		
 			boolean attemptingTask= attemptTask(currentTask);
 			if(!attemptingTask){
+				Sound.beep();
 				blockNextTile(robotTileX,robotTileY,currentTask);
+				this.myField.displayField();
+				robotTileX= (int) (this.myRobot.getPosition().getPositionX()/this.myField.getTileSize());
+				robotTileY= (int) (this.myRobot.getPosition().getPositionY()/this.myField.getTileSize());
 				path= aStarAlgorithm.aStar(myField.getTiles(), robotTileX,robotTileY, tileX,tileY);
 				i=-1;
 			}
@@ -55,7 +70,7 @@ public class Game {
 						nextTileY= posy;
 						break;
 		}
-		this.myField.getTile(nextTileX, nextTileY).setBlock(Block.BLOCKED);
+		this.myField.getTile(nextTileY, nextTileX).setBlock(Block.BLOCKED);
 	}
 	
 	public boolean attemptTask(Task t){
@@ -70,14 +85,24 @@ public class Game {
 		case MOVELEFT:  this.navigator.turnLeft();
 						break;
 		}
-		Thread.sleep(2000);
+		try {
+			Thread.sleep(200);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		float usDist= USpoller.getDistance();
 		if(usDist<0.25){
 			return false;
 		}
 		this.navigator.goForwardHalfTile(this.myField.getTileSize());
 		this.myRobot.setPosition(new Position(this.navigator.getCurrentX(),this.navigator.getCurrentY()));
-		Thread.sleep(2000);
+		try {
+			Thread.sleep(200);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		usDist= USpoller.getDistance();
 		if(usDist<0.25){
 			return false;
