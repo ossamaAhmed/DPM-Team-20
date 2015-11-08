@@ -36,9 +36,7 @@ public class FilteredUltrasonicPoller extends Thread {
 		// initialize an array of floats for fetching samples
 		this.usData = new float[usFilteredSource.sampleSize()];
 	}
-	/** 
-	 * This method takes care of running the filtered color sensor to get filtered readings
-	 */
+
 	public void run() {
 		while (true) {
 			usFilteredSource.fetchSample(usData, 0); // acquire data

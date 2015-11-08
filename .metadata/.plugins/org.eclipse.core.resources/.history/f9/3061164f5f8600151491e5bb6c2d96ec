@@ -98,11 +98,7 @@ public class Game {
 		}
 		this.myField.getTile(nextTileY, nextTileX).setBlock(Block.BLOCKED);
 	}
-	/** 
-	 * This method takes care of actually attempting the task using the hardware of the robot
-	 * @param t is the task that the robot should attempt
-	 * @return it returns true is the task was attempted successfully and false otehrwise
-	 */
+	
 	public boolean attemptTask(Task t){
 	//update the robot's position
 		switch(t){

@@ -73,7 +73,6 @@ public class Field {
 	 * @param x is the x index of the tile you want to get
 	 * @param y is the y index of the tile you want to get
 	 * @return it returns the tile at the x and y locations
-	 * @author Ossama Ahmed
 	 */
 	public Tile getTile(int x,int y){
 		return this.Map[x][y];
@@ -83,7 +82,6 @@ public class Field {
 	 * @param x is the x index of the tile you want to get it's neighbors
 	 * @param y is the y index of the tile you want to get it's neighbors
 	 * @return it returns a list of tiles of the neighboring tiles (north, south, east, west)
-	 * @author Ossama Ahmed
 	 */
 	public Tile[] getNeighbouringTiles(int x,int y){
 		Tile[] neighbouringTiles= new Tile[4];
@@ -119,7 +117,6 @@ public class Field {
 	}
 	/** 
 	 * This method takes care of getting the tiles 2D array
-	 * @author Ossama Ahmed
 	 * @return it returns the 2D tile array
 	 */
 	public Tile[][] getTiles(){

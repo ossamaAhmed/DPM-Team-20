@@ -25,11 +25,7 @@ public class MaxValueFilter extends AbstractFilter {
 		super(source);
 		this.max = max;
 	}
-	/** 
-	 * This method takes care of fetching a sample 
-	 * @param sample is an array where the samples should be filtered
-	 * @param offset is the offset in the sample array
-	 */
+
 	public void fetchSample(float sample[], int offset) {
 		super.fetchSample(sample, offset);
 		for (int i = 0; i < sampleSize(); i++) {

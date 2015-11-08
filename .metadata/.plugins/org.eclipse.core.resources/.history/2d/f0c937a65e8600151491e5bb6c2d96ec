@@ -20,10 +20,9 @@ public class Game {
 	/** 
 	 * Constructor
 	 * This method takes care of initializing the game object 
-	 * @param myRobot is the robot that will play the game
-	 * @param myField is the field that the robot will be navigating in
-	 * @param USpoller is the ultrasonic sensor that will be used in detecting the obstacles 
-	 * and blocking the tiles
+	 * @param xTiles is the number of tiles in the x coordinate 
+	 * @param yTiles is the number of tiles in the y coordinate 
+	 * @param tileSize is the size of the physical tile
 	 */
 	public Game(Robot myRobot,Field myField, Navigator navigator, FilteredUltrasonicPoller USpoller){
 		this.myField= myField;
@@ -31,11 +30,6 @@ public class Game {
 		this.navigator=navigator; 
 		this.USpoller= USpoller;
 	}
-	/** 
-	 * This method takes care of moving the robot to a specified tile
-	 * @param tileX is the x index of the tile the robot should navigate to
-	 * @param tileY is the y index of the tile the robot should navigate to  
-	 */
 	public void moveRobot(int tileX, int tileY){
 		this.myField.displayField();
 		int robotTileX= (int) ((int) this.myRobot.getPosition().getPositionX()/this.myField.getTileSize());
@@ -72,13 +66,6 @@ public class Game {
 		//if empty, attempt the move and go to the next movment, if not empty: block it
 		//and generate a new path out of the new starting point but with the new ending point, change tha array list 
 	}
-	/** 
-	 * This method takes care of blocking the next tile that the robot detected an object in
-	 * @param posx is the x index of the tile that the robot is currently in
-	 * @param posy is the y index of the tile that the robot is currently in 
-	 * @param task is the task that the robot was attempting to perform and got blocked while 
-	 * performing it 
-	 */
 	public void blockNextTile(int posx,int posy,Task task){
 		int nextTileX= posx;
 		int nextTileY= posy;
@@ -98,11 +85,7 @@ public class Game {
 		}
 		this.myField.getTile(nextTileY, nextTileX).setBlock(Block.BLOCKED);
 	}
-	/** 
-	 * This method takes care of actually attempting the task using the hardware of the robot
-	 * @param t is the task that the robot should attempt
-	 * @return it returns true is the task was attempted successfully and false otehrwise
-	 */
+	
 	public boolean attemptTask(Task t){
 	//update the robot's position
 		switch(t){

@@ -76,8 +76,6 @@ public class Game {
 	 * This method takes care of blocking the next tile that the robot detected an object in
 	 * @param posx is the x index of the tile that the robot is currently in
 	 * @param posy is the y index of the tile that the robot is currently in 
-	 * @param task is the task that the robot was attempting to perform and got blocked while 
-	 * performing it 
 	 */
 	public void blockNextTile(int posx,int posy,Task task){
 		int nextTileX= posx;
@@ -98,11 +96,7 @@ public class Game {
 		}
 		this.myField.getTile(nextTileY, nextTileX).setBlock(Block.BLOCKED);
 	}
-	/** 
-	 * This method takes care of actually attempting the task using the hardware of the robot
-	 * @param t is the task that the robot should attempt
-	 * @return it returns true is the task was attempted successfully and false otehrwise
-	 */
+	
 	public boolean attemptTask(Task t){
 	//update the robot's position
 		switch(t){

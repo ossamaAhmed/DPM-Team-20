@@ -119,7 +119,6 @@ public class Field {
 	}
 	/** 
 	 * This method takes care of getting the tiles 2D array
-	 * @author Ossama Ahmed
 	 * @return it returns the 2D tile array
 	 */
 	public Tile[][] getTiles(){

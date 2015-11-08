@@ -1,11 +1,5 @@
 package ev3Sensors;
-/*
- * File: FilteredColorPoller.java
- * Written by: Rick Wu
- * ECSE 211 - Design Principles and Methods
- * Fall 2015
- * FilteredColorPoller class is responsible for getting filtered readings from the color sensor
- */
+
 import lejos.hardware.*;
 import lejos.hardware.sensor.SensorModes;
 import lejos.robotics.SampleProvider;
