@@ -14,7 +14,7 @@ public class ArmController {
 	
 
 	// Resources
-	private static final EV3LargeRegulatedMotor[] armMotor = { new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C")), new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B")) };
+	private static final EV3LargeRegulatedMotor[] armMotor = { new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B")), new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C")) };
 	//
 	
 	// Adjustable Variables
