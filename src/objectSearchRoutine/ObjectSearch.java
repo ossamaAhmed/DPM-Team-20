@@ -107,7 +107,7 @@ public class ObjectSearch {
 	}
 
 	public boolean checkForObject(float distance) {
-		sleep(500);
+		delay(500);
 		if (usSensor.getDistance() <= distance) {
 			return true;
 
@@ -118,7 +118,7 @@ public class ObjectSearch {
 
 	public boolean identifyObject() {
 		for (int i = 0; i < 5; i++) {
-			sleep(100);
+			delay(100);
 			if (flagColorList.contains(colorPoller.getReadingOf(0))) return true;
 		}
 		return false;
@@ -136,7 +136,7 @@ public class ObjectSearch {
 		flagColorList.add(color);
 	}
 
-	public void sleep(long time) {
+	public void delay(long time) {
 		try {
 			Thread.sleep(time);
 		} catch (InterruptedException e) {

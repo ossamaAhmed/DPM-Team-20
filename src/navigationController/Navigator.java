@@ -21,6 +21,7 @@ import motorController.DriveController;
 public class Navigator extends Thread {
 	final int FAST = 200;
 	final int SLOW = 50;
+	final long delayAmount = 200;
 	static final int ACCELERATION = 1500;
 	final static double DEG_ERR = 2.0, CM_ERR = 1.0;
 	private Odometer odometer;
@@ -59,6 +60,9 @@ public class Navigator extends Thread {
 	 * @param y The desired Y coordinate
 	 */
 	public void travelTo(double x, double y) {
+		drive.setSpeeds(0, 0);
+		delay(delayAmount);
+		
 		double minAng;
 		minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX())) * (180.0 / Math.PI);
 		if (minAng < 0) minAng += 360.0;
@@ -76,9 +80,12 @@ public class Navigator extends Thread {
 			}
 		
 		drive.setSpeeds(0, 0);
+		delay(delayAmount);
 	}
 	
 	public void travelToBackwards(double x, double y){
+		drive.setSpeeds(0, 0);
+		delay(delayAmount);
 		
 		double minAng;
 		minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX())) * (180.0 / Math.PI);
@@ -98,6 +105,7 @@ public class Navigator extends Thread {
 			}
 		
 		drive.setSpeeds(0, 0);
+		delay(delayAmount);
 	}
 		
 
@@ -111,6 +119,9 @@ public class Navigator extends Thread {
 	 * @param stop If true, the robot will stop its motors after turning to the desired angle
 	 */
 	public void turnTo(double angle, boolean stop) {
+		drive.setSpeeds(0, 0);
+		delay(delayAmount);
+		
 		angle = Odometer.fixDegAngle(angle);
 		double error = angle - this.odometer.getAng();
 		
@@ -130,14 +141,9 @@ public class Navigator extends Thread {
 		}
 		if (stop) {
 			drive.setSpeeds(0, 0);
+			delay(delayAmount);
 		}
-		
-		try {
-			Thread.sleep(250);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
 	}
 	
 
@@ -232,6 +238,16 @@ public class Navigator extends Thread {
 		double distance=Math.sqrt(dx*dx + dy*dy);
 		return distance;
 	}
+	
+	public void delay(long time) {
+		try {
+			Thread.sleep(time);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public void start() {
 		// Nothing needs to run here
 		
