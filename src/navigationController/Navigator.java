@@ -131,6 +131,13 @@ public class Navigator extends Thread {
 		if (stop) {
 			drive.setSpeeds(0, 0);
 		}
+		
+		try {
+			Thread.sleep(250);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 

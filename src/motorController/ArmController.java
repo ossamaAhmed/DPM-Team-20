@@ -19,6 +19,7 @@ public class ArmController {
 	
 	// Adjustable Variables
 	private static final int armAngle[] = {135,135}; // The required rotation to raise or lower the arm
+	private static final int captureAngle[] = {135,135}; // The required rotation to raise or lower the arm
 	//
 	
 
@@ -52,5 +53,10 @@ public class ArmController {
 	public void raiseArmTo(int index, int angle){
 		armMotor[index].rotate(angle);
 	}
+	
+	public void captureObject(){
+		raiseArmTo(0,captureAngle[0]);
+		raiseArmTo(1,captureAngle[1]);
 
+	}
 }

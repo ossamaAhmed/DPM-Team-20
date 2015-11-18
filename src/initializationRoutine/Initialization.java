@@ -52,11 +52,13 @@ public class Initialization {
 
 		// Left Button
 		if (buttonChoice == Button.ID_LEFT) {
+			nav.travelTo(60, 0);
 
 		}
 
 		// Right Button
 		else if (buttonChoice == Button.ID_RIGHT) {
+			arm.raiseArm(0);
 			nav.travelTo(60, 0);
 			nav.travelTo(60, 60);
 			nav.travelTo(0,60);
