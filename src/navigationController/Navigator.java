@@ -9,6 +9,7 @@ package navigationController;
  * 
  * Movement control class (turnTo, travelTo, flt, localize)
  */
+import sensorController.FilteredColorPoller;
 import navigationController.Odometer;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import motorController.DriveController;
@@ -19,33 +20,56 @@ import motorController.DriveController;
  *
  */
 public class Navigator extends Thread {
-	final int FAST = 200;
-	final int SLOW = 50;
+	final int FAST = 100;
+	final int SLOW = 100;
 	final long delayAmount = 200;
 	static final int ACCELERATION = 1500;
-	final static double DEG_ERR = 2.0, CM_ERR = 1.0;
+	final static double DEG_ERR = 2.0, CM_ERR = 3.0;
 	private Odometer odometer;
 	private EV3LargeRegulatedMotor leftMotor, rightMotor;
 	public DriveController drive;
+	public FilteredColorPoller colorPoller;
 
 	/**
 	 * The constructor takes a Odometer and DriveController
 	 * 
 	 * @param odo Used to retrieve current x,y,theta position for navigation
 	 */
-	public Navigator(Odometer odo, DriveController drive) {
+	public Navigator(Odometer odo, DriveController drive,FilteredColorPoller colorPoller) {
 		this.odometer = odo;
 		this.drive = drive;
 		EV3LargeRegulatedMotor[] motors = this.drive.getMotors();
 		this.leftMotor = motors[0];
 		this.rightMotor = motors[1];
-
+		this.colorPoller=colorPoller;
 		// set acceleration
 		this.drive.setAcceleration(ACCELERATION);
 		this.start();
 	}
 
-
+	public void travelToDiagonaly(double x, double y) {
+		drive.setSpeeds(0, 0);
+		delay(delayAmount);
+		
+		double minAng;
+		minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX())) * (180.0 / Math.PI);
+		if (minAng < 0) minAng += 360.0;
+		
+		this.turnTo(minAng, true);
+		drive.setSpeeds(FAST, FAST);
+		
+		double dx= x - odometer.getX();
+		double dy= y - odometer.getY();
+		double distance= Math.sqrt(Math.pow(dx, 2)+Math.pow(dy, 2));
+		while (distance > CM_ERR ) {
+			dx=x - odometer.getX();
+			dy= y - odometer.getY();
+			distance= Math.sqrt(Math.pow(dx, 2)+Math.pow(dy, 2));
+			}
+		
+		drive.setSpeeds(0, 0);
+		delay(delayAmount);
+	}
 
 
 
@@ -74,6 +98,100 @@ public class Navigator extends Thread {
 		double dy= y - odometer.getY();
 		double distance= Math.sqrt(Math.pow(dx, 2)+Math.pow(dy, 2));
 		while (distance > CM_ERR ) {
+//			if(colorPoller.isColorSensorReadingBlackLine(1)&&colorPoller.isColorSensorReadingBlackLine(2)){
+//				drive.setSpeeds(FAST, FAST);
+////				double correctedY= odometer.getY();
+////				double correctedX= odometer.getX();
+////				System.out.println("correcting "+odometer.getX()+"  y:" + odometer.getY());
+////				if( getDirection()==1){
+////					 correctedY= roundToNearestMultipleOf(odometer.getY(), 30-5.5);
+////					 correctedX= odometer.getX();
+////				}
+////				else if(getDirection()==2){
+////					 correctedY= roundToNearestMultipleOf(odometer.getY(), 30+5.5);
+////					 correctedX= odometer.getX();
+////				}
+////				else if(getDirection()==3){
+////					 correctedX= roundToNearestMultipleOf(odometer.getX(), 30-5.5);
+////					 correctedY= odometer.getY();
+////
+////
+////				}
+////				else if( getDirection()==4){
+////					 correctedX= roundToNearestMultipleOf(odometer.getX(), 30+5.5);
+////					 correctedY= odometer.getY();
+////				}
+////				System.out.println("correcting "+odometer.getX()+"  y:" + odometer.getY());
+////				double[] newpos= {correctedX,correctedY,0};
+////				boolean[] newbol= {true,true,false};
+////				odometer.setPosition(newpos, newbol);
+//
+//			}
+//			else if(colorPoller.isColorSensorReadingBlackLine(1)&&!colorPoller.isColorSensorReadingBlackLine(2)){
+//				double correctedY= odometer.getY();
+//				double correctedX= odometer.getX();
+//				drive.setSpeeds(0, FAST);
+////				System.out.println("correcting "+odometer.getX()+"  y:" + odometer.getY());
+////				if( getDirection()==1 ||  getDirection()==2){
+////					 correctedY= roundToNearestMultipleOf(odometer.getY(), 30-5.5);
+////					 correctedX= odometer.getX();
+////				}
+////				else if(getDirection()==2){
+////					 correctedY= roundToNearestMultipleOf(odometer.getY(), 30+5.5);
+////					 correctedX= odometer.getX();
+////				}
+////				else if(getDirection()==3){
+////					 correctedX= roundToNearestMultipleOf(odometer.getX(), 30-5.5);
+////					 correctedY= odometer.getY();
+////
+////
+////				}
+////				else if( getDirection()==4){
+////					 correctedX= roundToNearestMultipleOf(odometer.getX(), 30+5.5);
+////					 correctedY= odometer.getY();
+////				}
+////				System.out.println("correcting "+odometer.getX()+"  y:" + odometer.getY());
+////				double[] newpos= {correctedX,correctedY,0};
+////				boolean[] newbol= {true,true,false};
+////				odometer.setPosition(newpos, newbol);
+////				System.out.println("correcting "+odometer.getX()+"  y:" + odometer.getY());
+//			
+//
+//			}
+//			else if(!colorPoller.isColorSensorReadingBlackLine(1)&&colorPoller.isColorSensorReadingBlackLine(2)){
+//				double correctedY= odometer.getY();
+//				double correctedX= odometer.getX();
+//				drive.setSpeeds(FAST, 0);
+////				System.out.println("correcting "+odometer.getX()+"  y:" + odometer.getY());
+////				if( getDirection()==1 ||  getDirection()==2){
+////					 correctedY= roundToNearestMultipleOf(odometer.getY(), 30-5.5);
+////					 correctedX= odometer.getX();
+////				}
+////				else if(getDirection()==2){
+////					 correctedY= roundToNearestMultipleOf(odometer.getY(), 30+5.5);
+////					 correctedX= odometer.getX();
+////				}
+////				else if(getDirection()==3){
+////					 correctedX= roundToNearestMultipleOf(odometer.getX(), 30-5.5);
+////					 correctedY= odometer.getY();
+////
+////
+////				}
+////				else if( getDirection()==4){
+////					 correctedX= roundToNearestMultipleOf(odometer.getX(), 30+5.5);
+////					 correctedY= odometer.getY();
+////				}
+////				System.out.println("correcting "+odometer.getX()+"  y:" + odometer.getY());
+////				double[] newpos= {correctedX,correctedY,0};
+////				boolean[] newbol= {true,true,false};
+////				odometer.setPosition(newpos, newbol);
+////				System.out.println("correcting "+odometer.getX()+"  y:" + odometer.getY());
+//				
+//			}
+//			else{
+//				
+//				drive.setSpeeds(FAST, FAST);
+//			}
 			dx=x - odometer.getX();
 			dy= y - odometer.getY();
 			distance= Math.sqrt(Math.pow(dx, 2)+Math.pow(dy, 2));
@@ -154,6 +272,16 @@ public class Navigator extends Thread {
 	public void goForward(double distance) {
 		if (distance >= 0){
 		this.travelTo(odometer.getX()+ Math.cos(Math.toRadians(this.odometer.getAng())) * distance,odometer.getY()+ Math.sin(Math.toRadians(this.odometer.getAng())) * distance);
+		}
+		
+		else {
+			
+		}
+
+	}
+	public void goBackwards(double distance) {
+		if (distance >= 0){
+		this.travelToBackwards(odometer.getX()- Math.cos(Math.toRadians(this.odometer.getAng())) * distance,odometer.getY()- Math.sin(Math.toRadians(this.odometer.getAng())) * distance);
 		}
 		
 		else {
@@ -251,5 +379,40 @@ public class Navigator extends Thread {
 	public void start() {
 		// Nothing needs to run here
 		
+	}
+	
+	public int getDirection() {
+		// Null = 0
+		// North = 1
+		// South = 2
+		// East = 3
+		// West = 4
+
+		int result = 0;
+		double angle = odometer.getAng();
+		//East
+		if (angle <= 45 && angle >= 0 || angle >= 315 && angle <= 360) {
+			result = 3;
+		}
+		// North
+		else if (angle > 45 && angle < 135) {
+			result = 1;
+		}
+		// West
+		else if (angle >= 135 && angle <= 235) {
+			result = 4;
+		}
+		// South
+		else if (angle > 235 && angle < 315) {
+			result = 2;
+
+		}
+
+		return result;
+
+	}
+	public double roundToNearestMultipleOf(double numberToRound, double multipleOf) {
+		double result = Math.round(numberToRound / multipleOf) * multipleOf;
+		return result;
 	}
 }

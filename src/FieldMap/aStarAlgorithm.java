@@ -71,7 +71,7 @@ public class aStarAlgorithm {
 				}
 				if (i == 2) {
 					//check upper cell
-					if (myCell.getTileIndexY() + 1 <= myMap.length) {
+					if (myCell.getTileIndexY() + 1 <= myMap.length-1) {
 						successor = myMap[myCell.getTileIndexY()+1][myCell.getTileIndexX()];
 						if(successor.getParent()!=null){
 							oldScore=successor.getFScore();

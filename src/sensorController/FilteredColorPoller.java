@@ -18,13 +18,13 @@ import lejos.robotics.filter.MedianFilter;
 public class FilteredColorPoller extends Thread {
 
 	// Resources
-	private static final Port[] colorPort = { LocalEV3.get().getPort("S2"), LocalEV3.get().getPort("S3") };
-	private SampleProvider colorFilteredSource[] = new SampleProvider[2];
-	float[][] colorData = new float[2][];
-	private String[] colorMode = { "ColorID", "Red" };
+	private static final Port[] colorPort = { LocalEV3.get().getPort("S2"), LocalEV3.get().getPort("S3"),LocalEV3.get().getPort("S4") };
+	private SampleProvider colorFilteredSource[] = new SampleProvider[3];
+	float[][] colorData = new float[3][];
+	private String[] colorMode = { "ColorID", "ColorID","ColorID" };
 
 	// Adjustable Variables
-	private static final int[] colorReadingsToMedian = { 5, 5 };
+	private static final int[] colorReadingsToMedian = { 8, 8,8};
 
 	/** 
 	 * Constructor
@@ -33,14 +33,14 @@ public class FilteredColorPoller extends Thread {
 	 * @param ReadingsToMedian is an array that will have the readings stored in
 	 */
 	public FilteredColorPoller() {
-		SensorModes colorSensor[] = new SensorModes[2];
-		for (int i = 0; i < 2; i++) {
+		SensorModes colorSensor[] = new SensorModes[3];
+		for (int i = 0; i < 3; i++) {
 			colorSensor[i] = new EV3ColorSensor(colorPort[i]);
 		}
 
-		SampleProvider[] colorReading = new SampleProvider[2];
-		SampleProvider[] colorMedianSource = new SampleProvider[2];
-		for (int i = 0; i < 2; i++) {
+		SampleProvider[] colorReading = new SampleProvider[3];
+		SampleProvider[] colorMedianSource = new SampleProvider[3];
+		for (int i = 0; i < 3; i++) {
 			colorReading[i] = colorSensor[i].getMode(colorMode[i]);
 			// Stack a filter which takes average readings
 			colorMedianSource[i] = new MedianFilter(colorReading[i], colorReadingsToMedian[i]);
@@ -57,7 +57,7 @@ public class FilteredColorPoller extends Thread {
 	 */
 	public void run() {
 		while (true) {
-			for (int i = 0; i < 2; i++) {
+			for (int i = 0; i < 3; i++) {
 				colorFilteredSource[i].fetchSample(colorData[i], 0);
 			}
 			try {
@@ -71,8 +71,8 @@ public class FilteredColorPoller extends Thread {
 	 * This method takes care of getting the color readings of the color sensor
 	 * @return it returns the color id read by the sensor
 	 */
-	public float getID() {
-		return this.colorData[0][0];
+	public float getID(int i) {
+		return this.colorData[i][0];
 	}
 
 	/** 
@@ -81,6 +81,12 @@ public class FilteredColorPoller extends Thread {
 	 */
 	public boolean blueObject() {
 		if (this.colorData[0][0] == 6 || this.colorData[0][0] == 7)
+			return true;
+
+		return false;
+	}
+	public boolean isColorSensorReadingBlackLine(int i) {
+		if (this.colorData[i][0] > 10)
 			return true;
 
 		return false;
