@@ -8,11 +8,11 @@ public class OdometerCorrection extends Thread {
 	private Odometer odo;
 	private FilteredColorPoller colorPoller;
 	//Variables
-	private final static double distanceOfSensor = 7; // Distance of sensor from center of robot wheels
-	private final float lineIntensity = 0.4f;
+	private final static double distanceOfSensor = 5.5; // Distance of sensor from center of robot wheels
+	private final float lineIntensity = 10;
 	private final double correctionDistanceThreshold = 10;
 	//
-	private double[] lastCorrectionCoordinate = { 0, 0 }; // Last place odometry correction occured 
+	private double[] lastCorrectionCoordinate = { 900, 900 }; // Last place odometry correction occured 
 
 	public OdometerCorrection(Odometer odo, FilteredColorPoller colorPoller) {
 		this.odo = odo;
@@ -42,22 +42,22 @@ public class OdometerCorrection extends Thread {
 		int direction = getDirection();
 		switch (direction) {
 		case 1: {
-			newY = roundToNearestMultipleOf(currentY-distanceOfSensor, 15);
-			newY += distanceOfSensor;
+			newY = roundToNearestMultipleOf(currentY, 15);
+			newY -= distanceOfSensor;
 
 		}
 		case 2: {
-			newY = roundToNearestMultipleOf(currentY+distanceOfSensor, 15);
-			newY -= distanceOfSensor;
+			newY = roundToNearestMultipleOf(currentY, 15);
+			newY += distanceOfSensor;
 		}
 		case 3:{
-			newX = roundToNearestMultipleOf(currentX-distanceOfSensor, 15);
-			newX += distanceOfSensor;
+			newX = roundToNearestMultipleOf(currentX, 15);
+			newX -= distanceOfSensor;
 			
 		}
 		case 4: {
-			newX = roundToNearestMultipleOf(currentX+distanceOfSensor, 15);
-			newX -= distanceOfSensor;
+			newX = roundToNearestMultipleOf(currentX, 15);
+			newX += distanceOfSensor;
 		}
 		}
 		double[] updatePos = {newX,newY,0};
@@ -67,7 +67,7 @@ public class OdometerCorrection extends Thread {
 	}
 
 	public boolean lineDetected() {
-		if (colorPoller.getReadingOf(1) <= lineIntensity) {
+		if (colorPoller.getReadingOf(1) > lineIntensity) {
 			return true;
 		}
 

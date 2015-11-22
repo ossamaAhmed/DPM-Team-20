@@ -115,6 +115,8 @@ public class Game {
 		case MOVELEFT:  this.navigator.turnLeft();
 						break;
 		}
+		this.navigator.goBackwards(8);
+		this.myRobot.setPosition(new Position(this.navigator.getCurrentX(),this.navigator.getCurrentY()));
 		try {
 			Thread.sleep(200);
 		} catch (InterruptedException e1) {
@@ -123,6 +125,8 @@ public class Game {
 		}
 		float usDist= USpoller.getDistance();
 		if(usDist<0.25){
+			this.navigator.goForward(8);
+			this.myRobot.setPosition(new Position(this.navigator.getCurrentX(),this.navigator.getCurrentY()));
 			return false;
 		}
 		this.navigator.goForwardHalfTile(this.myField.getTileSize());
@@ -135,12 +139,89 @@ public class Game {
 		}
 		usDist= USpoller.getDistance();
 		if(usDist<0.25){
+			this.navigator.goBackwards((this.myField.getTileSize()/2)-8);
+			this.myRobot.setPosition(new Position(this.navigator.getCurrentX(),this.navigator.getCurrentY()));
 			return false;
 		}
 		this.navigator.goForwardHalfTile(this.myField.getTileSize());
+		this.navigator.goForward(8);
 		this.myRobot.setPosition(new Position(this.navigator.getCurrentX(),this.navigator.getCurrentY()));
 		return true;
 		
+	}
+	public void searchTile(Tile suspectedTile){
+		//face the suspected tile
+		int robotTileX = (int) (this.myRobot.getPosition().getPositionX() / this.myField
+				.getTileSize());
+		int robotTileY = (int) (this.myRobot.getPosition().getPositionY() / this.myField
+				.getTileSize());
+		turnToTile(suspectedTile);
+		try {
+			Thread.sleep(300);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		float usDist = USpoller.getDistance();
+		if (usDist < 0.25) {
+			Sound.beep();
+			inspectObject(suspectedTile);
+			this.navigator.travelToBackwards(robotTileX*this.myField.getTileSize()-15,robotTileY*this.myField.getTileSize()-15 );
+			return;
+		}
+		this.navigator.goForwardHalfTile(this.myField.getTileSize());
+		this.myRobot.setPosition(new Position(this.navigator.getCurrentX(),
+				this.navigator.getCurrentY()));
+		try {
+			Thread.sleep(200);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		usDist = USpoller.getDistance();
+		if (usDist < 0.25) {
+			Sound.beep();
+			inspectObject(suspectedTile);
+			this.navigator.travelToBackwards(robotTileX*this.myField.getTileSize()-15,robotTileY*this.myField.getTileSize()-15 );
+			return;
+		}
+		//search the tile for any objects 
+		//if object detected go search it and if an object was styrofoam just go 
+	}
+	public void inspectObject(Tile suspectedTile){
+		float usDist = USpoller.getDistance();
+		while(usDist>0.07){
+			this.navigator.goForward(1);
+		}
+		this.myRobot.setPosition(new Position(this.navigator.getCurrentX(),
+				this.navigator.getCurrentY()));
+		//poll the object and scan
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public void turnToTile(Tile suspectedTile){
+		int robotTileX = (int) (this.myRobot.getPosition().getPositionX() / this.myField
+				.getTileSize());
+		int robotTileY = (int) (this.myRobot.getPosition().getPositionY() / this.myField
+				.getTileSize());
+		int differenceX= robotTileX-suspectedTile.getTileIndexX();
+		int differenceY= robotTileY-suspectedTile.getTileIndexY();
+		if(differenceY==-1){
+			this.navigator.turnUp();
+		}
+		else if(differenceY==1){
+			this.navigator.turnDown();
+		}
+		else if(differenceX==-1){
+			this.navigator.turnRight();
+		}
+		else if(differenceX==1){
+			this.navigator.turnLeft();
+		}
 	}
 	
 
