@@ -319,10 +319,11 @@ public class Navigator extends Thread {
 		if (minAng < 0) minAng += 360.0;
 		minAng+=180;
 		
-		if (minAng > DEG_ERR && checkDegError) {
-			this.turnTo(minAng, true);		
+		// If checkDegError = true, only turn if minAng > DEG_ERR
+		if (checkDegError) {
+			if (minAng > DEG_ERR) this.turnTo(minAng, true);		
 		}
-		else {
+		else if (!checkDegError) {
 			this.turnTo(minAng, true);
 		}
 		
