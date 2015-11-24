@@ -111,6 +111,7 @@ public class Navigator extends Thread {
 		double dy= y - odo.getY();
 		double distance= Math.sqrt(Math.pow(dx, 2)+Math.pow(dy, 2));
 		adjustHeading(x,y,false);
+		loop:
 		while (true)
 		{
 			if (correctionInterrupt){
@@ -126,9 +127,11 @@ public class Navigator extends Thread {
 				
 			}
 			
-			if  (distance < DEG_ERR) break;
+			if  (distance < DEG_ERR) break loop;
 			delay(100);	
 		}
+		drive.setSpeeds(0, 0);
+		delay(delayAmount);
 	}
 	
 	public void travelToBackwards(double x, double y){
