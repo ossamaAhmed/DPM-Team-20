@@ -18,13 +18,14 @@ import lejos.robotics.filter.MedianFilter;
 public class FilteredColorPoller extends Thread {
 
 	// Resources
+	private static final int numberOfSensors = 3;
 	private static final Port[] colorPort = { LocalEV3.get().getPort("S2"), LocalEV3.get().getPort("S3"),LocalEV3.get().getPort("S4") };
-	private SampleProvider colorFilteredSource[] = new SampleProvider[3];
-	float[][] colorData = new float[3][];
-	private String[] colorMode = { "ColorID", "ColorID","ColorID" };
+	private SampleProvider colorFilteredSource[] = new SampleProvider[numberOfSensors];
+	float[][] colorData = new float[numberOfSensors][];
 
 	// Adjustable Variables
 	private static final int[] colorReadingsToMedian = { 8, 8,8};
+	private String[] colorMode = { "ColorID", "ColorID","ColorID" };
 
 	/** 
 	 * Constructor
@@ -33,14 +34,14 @@ public class FilteredColorPoller extends Thread {
 	 * @param ReadingsToMedian is an array that will have the readings stored in
 	 */
 	public FilteredColorPoller() {
-		SensorModes colorSensor[] = new SensorModes[3];
-		for (int i = 0; i < 3; i++) {
+		SensorModes colorSensor[] = new SensorModes[numberOfSensors];
+		for (int i = 0; i < numberOfSensors; i++) {
 			colorSensor[i] = new EV3ColorSensor(colorPort[i]);
 		}
 
-		SampleProvider[] colorReading = new SampleProvider[3];
-		SampleProvider[] colorMedianSource = new SampleProvider[3];
-		for (int i = 0; i < 3; i++) {
+		SampleProvider[] colorReading = new SampleProvider[numberOfSensors];
+		SampleProvider[] colorMedianSource = new SampleProvider[numberOfSensors];
+		for (int i = 0; i < numberOfSensors; i++) {
 			colorReading[i] = colorSensor[i].getMode(colorMode[i]);
 			// Stack a filter which takes average readings
 			colorMedianSource[i] = new MedianFilter(colorReading[i], colorReadingsToMedian[i]);
@@ -57,7 +58,7 @@ public class FilteredColorPoller extends Thread {
 	 */
 	public void run() {
 		while (true) {
-			for (int i = 0; i < 3; i++) {
+			for (int i = 0; i < numberOfSensors; i++) {
 				colorFilteredSource[i].fetchSample(colorData[i], 0);
 			}
 			try {

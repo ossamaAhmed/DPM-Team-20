@@ -18,8 +18,9 @@ public class ArmController {
 	//
 	
 	// Adjustable Variables
-	private static final int armAngle[] = {135,135}; // The required rotation to raise or lower the arm
-	private static final int captureAngle[] = {135,135}; // The required rotation to raise or lower the arm
+	private static final int raisedArmAngle[] = {0,0}; // The angle corresponding to a raised position
+	private static final int droppedArmAngle[] = {135,135}; // The angle corresponding to a dropped position
+	private static final int captureAngle[] = {135,135}; // The angles to rotate the arm to to capture an object
 	//
 	
 
@@ -32,7 +33,7 @@ public class ArmController {
 	 * @param index The arm that will be raised
 	 */
 	public void raiseArm(int index){
-		armMotor[index].rotateTo(0);
+		armMotor[index].rotateTo(raisedArmAngle[index]);
 	}
 	
 	/**
@@ -41,7 +42,7 @@ public class ArmController {
 	 * @param index The arm that will be lowered
 	 */
 	public void dropArm(int index){
-		armMotor[index].rotate(armAngle[index]);
+		armMotor[index].rotateTo(droppedArmAngle[index]);
 		
 	}
 	
@@ -58,5 +59,21 @@ public class ArmController {
 		raiseArmTo(0,captureAngle[0]);
 		raiseArmTo(1,captureAngle[1]);
 
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		//TODO
+		// Raise the arms back up so the robot can proceed
+		
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

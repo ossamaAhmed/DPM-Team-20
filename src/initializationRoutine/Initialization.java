@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import navigationController.*;
 import lejos.hardware.Button;
+import lejos.hardware.Sound;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;
 import localizationRoutine.USLocalizer;
@@ -25,6 +26,9 @@ public class Initialization {
 //	private static final String SERVER_IP = "192.168.10.200";
 	private static final String SERVER_IP = "192.168.43.83";
 	private static final int TEAM_NUMBER = 20;
+	private final static boolean useWifi = false;
+	private static WifiConnection conn = null;
+	private static Transmission t = null;
 
 	public static void main(String[] args) {
 
@@ -35,7 +39,7 @@ public class Initialization {
 		DriveController drive = new DriveController();
 		Odometer odo = new Odometer(drive);
 		Navigator nav = new Navigator(odo,drive,colorPoller);
-		OdometerCorrection odoC = new OdometerCorrection(odo,colorPoller);
+		OdometerCorrection odoC = new OdometerCorrection(odo,colorPoller,drive,nav);
 		
 
 		// User Interface
@@ -50,38 +54,57 @@ public class Initialization {
 
 		TextLCD LCD = LocalEV3.get().getTextLCD();
 		LCD.drawString("Ready", 0, 0);
-		WifiConnection conn = null;
-		try {
-			conn = new WifiConnection(SERVER_IP, TEAM_NUMBER);
-		} catch (IOException e) {
-			System.out.println("Connection failed");
-		}
-		Transmission t = conn.getTransmission();
-		int homeZoneBL_X = 0;
-		int homeZoneBL_Y = 0;
-		int opponentHomeZoneBL_X = 0;
-		int opponentHomeZoneBL_Y =0;
-		int dropZone_X =0;
-		int dropZone_Y = 0;
-		int flagType =0;
-		int	opponentFlagType = t.opponentFlagType;
-		if (t == null) {
-			LCD.drawString("Failed to read transmission", 0, 5);
-
-		} else {
-			StartCorner corner = t.startingCorner;
-			 homeZoneBL_X = t.homeZoneBL_X;
-			 homeZoneBL_Y = t.homeZoneBL_Y;
-			 opponentHomeZoneBL_X = t.opponentHomeZoneBL_X;
-			 opponentHomeZoneBL_Y = t.opponentHomeZoneBL_Y;
-			 dropZone_X = t.dropZone_X;
-			 dropZone_Y = t.dropZone_Y;
-			 flagType = t.flagType;
-			 opponentFlagType = t.opponentFlagType;
+		initWifi();
 		
-			// print out the transmission information
-			conn.printTransmission();
+		// New Command Line Initialization from console
+		// Performs all given commands in order
+		if (args.length != 0) {
+			  for (String s: args) {
+				  switch (s){
+					case "squareDrive":{
+						arm.raiseArm(0);
+						nav.travelTo(70, 0);
+						nav.travelTo(70, 70);
+						nav.travelTo(0,70);
+						nav.travelTo(0,0);
+						
+					}
+					case "localize": {
+						arm.raiseArm(0);
+						USLocalizer myLoc= new USLocalizer(odo, usPoller, nav, drive, USLocalizer.LocalizationType.RISING_EDGE);
+						myLoc.doLocalization();			
+					}
+					
+					case "navToZone": {
+						//Assumes robot begins at center of 2nd diagonal tile
+						double[] newpos2= {(35/2.0)+35,(35/2.0)+35,0};
+						boolean[] newbol2= {true,true,true};
+						odo.setPosition(newpos2, newbol2);
+						Robot myRobot= new Robot(new Position((35/2.0)+35,(35/2.0)+35));
+						Field myField= new Field(8,8,35);
+						Game myGame= new Game(myRobot,myField, nav, usPoller);
+						myGame.moveRobot(t.opponentHomeZoneBL_X, t.opponentHomeZoneBL_Y);
+						
+					}
+					
+					case "travelTo": {
+						arm.raiseArm(0);
+						double x = 17.5;
+						double y = 17.5;
+						nav.travelTo(x, y);
+					}
+					
+					case "odoC": {
+						odoC.start();
+					}
+					
+				}
+		        }
 		}
+		
+		
+		// If no command line arguements, resume old init with buttons
+		else {
 		do {
 			buttonChoice = Button.waitForAnyPress();
 		}
@@ -90,7 +113,6 @@ public class Initialization {
 		{
 			
 		}
-		//wifi setup 
 		
 		// Left Button
 		if (buttonChoice == Button.ID_LEFT) {
@@ -168,9 +190,29 @@ public class Initialization {
 			Robot myRobot= new Robot(new Position((35/2.0)+35,(35/2.0)+35));
 			Field myField= new Field(8,8,35);
 			Game myGame= new Game(myRobot,myField, nav, usPoller);
-			myGame.moveRobot(opponentHomeZoneBL_X, opponentHomeZoneBL_Y);
+			myGame.moveRobot(t.opponentHomeZoneBL_X, t.opponentHomeZoneBL_Y);
 
 		}
+		}
 
+	}
+	
+	public static void initWifi()	{
+		if (useWifi){
+			conn = null;
+			try {
+				conn = new WifiConnection(SERVER_IP, TEAM_NUMBER);
+			} catch (IOException e) {
+				System.out.println("Connection failed");
+			}
+			t = conn.getTransmission();
+			if (t == null) {
+				System.out.println("Failed to receive transmission");
+				Sound.buzz();
+				System.exit(0);
+
+			} 
+			}
+		
 	}
 }

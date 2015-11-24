@@ -1,12 +1,15 @@
 package navigationController;
 
 import lejos.hardware.Sound;
+import motorController.DriveController;
 import sensorController.FilteredColorPoller;
 
 public class OdometerCorrection extends Thread {
 	//Resources
 	private Odometer odo;
 	private FilteredColorPoller colorPoller;
+	private DriveController drive;
+	private Navigator nav;
 	//Variables
 	private final static double distanceOfSensor = 5.5; // Distance of sensor from center of robot wheels
 	private final float lineIntensity = 10;
@@ -14,31 +17,43 @@ public class OdometerCorrection extends Thread {
 	//
 	private double[] lastCorrectionCoordinate = { 900, 900 }; // Last place odometry correction occured 
 
-	public OdometerCorrection(Odometer odo, FilteredColorPoller colorPoller) {
+	public OdometerCorrection(Odometer odo, FilteredColorPoller colorPoller, DriveController drive,Navigator nav) {
 		this.odo = odo;
 		this.colorPoller = colorPoller;
+		this.drive = drive;
+		this.nav = nav;
 	}
 
 	public void run() {
 		while (true) {
-			if (lineDetected() && shouldCorrect()) {
-				doCorrection();
+			if ((lineDetected(1) || lineDetected(2)) && shouldCorrect()) {
+				nav.correctionInterrupt = true;
+				doAllignRobot();	
+				System.out.println("Performed correction at " + (int)odo.getX()+" , "+(int)odo.getY());
+				doOdoCorrection();
 				lastCorrectionCoordinate[0] = odo.getX();
 				lastCorrectionCoordinate[1] = odo.getY();
-				System.out.println("Performed correction at " + (int)lastCorrectionCoordinate[0]+" , "+(int)lastCorrectionCoordinate[1]);
+				System.out.println("Corrected odo to " + (int)odo.getX()+" , "+(int)odo.getY());
+				nav.correctionInterrupt = false;
+				
+				// Check if either sensor is on the line, afterwards:
+				// Stop the navigator, allign the robot, and then correct the odometer
 			}
+			
+			delay(50);
 
 		}
 
 	}
 
-	public void doCorrection() {
+	public void doOdoCorrection() {
 		// This is what the odometer is reading when the line is crossed
 		double currentX = odo.getX();
 		double currentY = odo.getY();
 		// This is the robots new x and y;
 		double newX = currentX;
 		double newY = currentY;
+		double newHeading = roundToNearestMultipleOf(odo.getAng(),90);
 		int direction = getDirection();
 		switch (direction) {
 		case 1: {
@@ -60,14 +75,33 @@ public class OdometerCorrection extends Thread {
 			newX += distanceOfSensor;
 		}
 		}
-		double[] updatePos = {newX,newY,0};
-		boolean[] updateBoolean = {true,true,false};
+		double[] updatePos = {newX,newY,newHeading};
+		boolean[] updateBoolean = {true,true,true};
 		odo.setPosition(updatePos, updateBoolean);
 
 	}
+	
+	public void doAllignRobot(){
+		boolean[] sensorIsOnLine = new boolean[3];
+		sensorIsOnLine[1] = lineDetected(1);
+		sensorIsOnLine[2] = lineDetected(2);
+		while ( !sensorIsOnLine[1] || !sensorIsOnLine[2]){
+			if (sensorIsOnLine[1]) drive.setSpeeds(0, drive.SLOW);
+			if (sensorIsOnLine[2]) drive.setSpeeds(drive.SLOW, 0);
+			sensorIsOnLine[1] = lineDetected(1);
+			sensorIsOnLine[2] = lineDetected(2);
+			
+		}
+		drive.setSpeeds(0, 0);
+		delay(100);
+		
+		// While either sensor is not on the line, stop the motor which is on the line
+		// and wait until both sensors are on the line before returning
+		
+	}
 
-	public boolean lineDetected() {
-		if (colorPoller.getReadingOf(1) > lineIntensity) {
+	public boolean lineDetected(int sensorNumber) {
+		if (colorPoller.getReadingOf(sensorNumber) > lineIntensity) {
 			return true;
 		}
 
@@ -123,6 +157,15 @@ public class OdometerCorrection extends Thread {
 	public double roundToNearestMultipleOf(double numberToRound, double multipleOf) {
 		double result = Math.round(numberToRound / multipleOf) * multipleOf;
 		return result;
+	}
+	
+	public void delay(long time) {
+		try {
+			Thread.sleep(time);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

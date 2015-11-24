@@ -53,6 +53,7 @@ public class DriveController {
 	 * The desired right motor speed
 	 */
 	public void setSpeeds(float lSpd, float rSpd) {
+		if (drivingMotor[0].getSpeed() == lSpd && drivingMotor[1].getSpeed() == rSpd) return;
 		drivingMotor[0].startSynchronization();
 		this.drivingMotor[0].setSpeed(lSpd);
 		this.drivingMotor[1].setSpeed(rSpd);
