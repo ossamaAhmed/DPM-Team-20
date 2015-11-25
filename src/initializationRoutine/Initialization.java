@@ -38,8 +38,8 @@ public class Initialization {
 		ArmController arm = new ArmController();
 		DriveController drive = new DriveController();
 		Odometer odo = new Odometer(drive);
-		Navigator nav = new Navigator(odo,drive,colorPoller);
-		OdometerCorrection odoC = new OdometerCorrection(odo,colorPoller,drive,nav);
+		OdometerCorrection odoC = new OdometerCorrection(odo,colorPoller,drive);
+		Navigator nav = new Navigator(odo,odoC,drive,colorPoller);
 		
 
 		// User Interface
@@ -95,7 +95,7 @@ public class Initialization {
 					}
 					
 					case "odoC": {
-						odoC.start();
+						odoC.run=true;
 					}
 					
 				}
@@ -136,7 +136,7 @@ public class Initialization {
 		else if (buttonChoice == Button.ID_UP) {
 			LCDInfo lcd = new LCDInfo(odo, usPoller, colorPoller);
 			drive.setFloat();
-			odoC.start();
+			odoC.run=true;
 			// Press enter to set both arms to zero, press up to set both arms to armAngle
 			while (buttonChoice != Button.ID_ENTER) {
 
@@ -164,7 +164,7 @@ public class Initialization {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			nav.travelToDiagonaly(15, 17);
+			nav.travelTo(15, 17);
 			nav.turnTo(0, true);
 			double[] newpos= {0,0,0};
 			boolean[] newbol= {true,true,true};
@@ -175,7 +175,7 @@ public class Initialization {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			nav.travelToDiagonaly((35/2.0), (35/2.0)+4);
+			nav.travelTo((35/2.0), (35/2.0)+4);
 			nav.turnTo(0, true);
 			try {
 				Thread.sleep(5000);
