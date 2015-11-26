@@ -1,0 +1,6 @@
+package FieldMap;
+
+public class Robot {
+	private Position myPosition;
+
+}
