@@ -24,8 +24,8 @@ public class FilteredColorPoller extends Thread {
 	float[][] colorData = new float[numberOfSensors][];
 
 	// Adjustable Variables
-	private static final int[] colorReadingsToMedian = { 8, 8,8};
-	private String[] colorMode = { "ColorID", "ColorID","ColorID" };
+	private static final int[] colorReadingsToMedian = { 8, 5,5};
+	private String[] colorMode = { "ColorID", "Red","Red" };
 
 	/** 
 	 * Constructor

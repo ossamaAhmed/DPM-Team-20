@@ -10,9 +10,9 @@ public class OdometerCorrection {
 	private DriveController drive;
 	public volatile boolean run = false;
 	//Variables
-	private final static double distanceOfSensor = 5.5; // Distance of sensor from center of robot wheels
-	private final float lineIntensity = 10;
-	private final double correctionDistanceThreshold = 10;
+	private final static double distanceOfSensor = 4.2; // Distance of sensor from center of robot wheels
+	private final float lineIntensity = 0.3f;
+	private final double correctionDistanceThreshold = 15;
 	//
 	private double[] lastCorrectionCoordinate = { 900, 900 }; // Last place odometry correction occured 
 
@@ -25,13 +25,14 @@ public class OdometerCorrection {
 	public boolean doCorrectionRoutine() {
 		if (!run) return false;
 		if ((lineDetected(1) || lineDetected(2)) && shouldCorrect()) {
+			System.out.println("1. Starting allign robot at " + (int) odo.getX() + " , " + (int) odo.getY() + " , " + (int) odo.getAng());
 			doAllignRobot();
 			
-			System.out.println("Performed correction at " + (int) odo.getX() + " , " + (int) odo.getY());
+			System.out.println("2. Performed  odo correction at " + (int) odo.getX() + " , " + (int) odo.getY() + " , " + (int) odo.getAng());
 			doOdoCorrection();
 			lastCorrectionCoordinate[0] = odo.getX();
 			lastCorrectionCoordinate[1] = odo.getY();
-			System.out.println("Corrected odo to " + (int) odo.getX() + " , " + (int) odo.getY());
+			System.out.println("3. Corrected odo to " + (int) odo.getX() + " , " + (int) odo.getY()+" , " + (int) odo.getAng());
 			return true;
 
 			// Check if either sensor is on the line, afterwards:
@@ -56,21 +57,21 @@ public class OdometerCorrection {
 		int direction = getDirection();
 		switch (direction) {
 		case 1: {
-			newY = roundToNearestMultipleOf(currentY, 15);
+			newY = roundToNearestMultipleOf(currentY, 30);
 			newY -= distanceOfSensor;
 
 		}
 		case 2: {
-			newY = roundToNearestMultipleOf(currentY, 15);
+			newY = roundToNearestMultipleOf(currentY, 30);
 			newY += distanceOfSensor;
 		}
 		case 3: {
-			newX = roundToNearestMultipleOf(currentX, 15);
+			newX = roundToNearestMultipleOf(currentX, 30);
 			newX -= distanceOfSensor;
 
 		}
 		case 4: {
-			newX = roundToNearestMultipleOf(currentX, 15);
+			newX = roundToNearestMultipleOf(currentX, 30);
 			newX += distanceOfSensor;
 		}
 		}
@@ -102,7 +103,7 @@ public class OdometerCorrection {
 	}
 
 	public boolean lineDetected(int sensorNumber) {
-		if (colorPoller.getReadingOf(sensorNumber) > lineIntensity) {
+		if (colorPoller.getReadingOf(sensorNumber) < lineIntensity) {
 			return true;
 		}
 

@@ -1,0 +1,44 @@
+﻿
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch ricktesting
+# Your branch is up-to-date with 'origin/ricktesting'.
+#
+# Changes to be committed:
+#	deleted:    bin/.gitignore
+#	modified:   bin/FieldMap/Block.class
+#	modified:   bin/FieldMap/Field.class
+#	modified:   bin/FieldMap/Position.class
+#	modified:   bin/FieldMap/Robot.class
+#	modified:   bin/FieldMap/Task.class
+#	modified:   bin/FieldMap/Tile.class
+#	modified:   bin/FieldMap/aStarAlgorithm.class
+#	modified:   bin/Game/Game.class
+#	modified:   bin/initializationRoutine/Initialization$1.class
+#	modified:   bin/initializationRoutine/Initialization.class
+#	modified:   bin/initializationRoutine/LCDInfo.class
+#	modified:   bin/localizationRoutine/LightLocalizer.class
+#	modified:   bin/localizationRoutine/USLocalizer$LocalizationType.class
+#	modified:   bin/localizationRoutine/USLocalizer.class
+#	modified:   bin/motorController/ArmController.class
+#	modified:   bin/motorController/DriveController.class
+#	modified:   bin/navigationController/Navigator.class
+#	modified:   bin/navigationController/Odometer.class
+#	modified:   bin/navigationController/OdometerCorrection.class
+#	modified:   bin/objectSearchRoutine/OLDObjectPoller.class
+#	modified:   bin/objectSearchRoutine/OLDObjectSearch.class
+#	modified:   bin/objectSearchRoutine/ObjectIdentifier.class
+#	modified:   bin/objectSearchRoutine/ObjectSearch.class
+#	modified:   bin/sensorController/FilteredColorPoller.class
+#	modified:   bin/sensorController/FilteredUltrasonicPoller.class
+#	modified:   bin/sensorController/MaxValueFilter.class
+#	modified:   bin/wifi/ParseTransmission.class
+#	modified:   bin/wifi/StartCorner.class
+#	modified:   bin/wifi/Transmission.class
+#	modified:   bin/wifi/WifiConnection.class
+#	modified:   bin/wifi/WifiTest.class
+#
+# Untracked files:
+#	bin/.DS_Store
+#
+

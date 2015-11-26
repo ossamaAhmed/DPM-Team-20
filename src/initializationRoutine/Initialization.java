@@ -124,6 +124,7 @@ public class Initialization {
 		// Right Button
 		else if (buttonChoice == Button.ID_RIGHT) {
 			arm.raiseArm(0);
+			odoC.run = true;
 			nav.travelTo(70, 0);
 			nav.travelTo(70, 70);
 			nav.travelTo(0,70);
