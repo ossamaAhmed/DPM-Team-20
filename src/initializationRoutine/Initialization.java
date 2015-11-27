@@ -3,6 +3,7 @@ package initializationRoutine;
 import java.io.IOException;
 import java.util.ArrayList;
 
+
 import navigationController.*;
 import lejos.hardware.Button;
 import lejos.hardware.ev3.LocalEV3;
@@ -86,6 +87,7 @@ public class Initialization {
 //			// print out the transmission information
 //			conn.printTransmission();
 //		}
+
 		do {
 			buttonChoice = Button.waitForAnyPress();
 		}
@@ -94,7 +96,6 @@ public class Initialization {
 		{
 			
 		}
-		//wifi setup 
 		
 		// Left Button
 		if (buttonChoice == Button.ID_LEFT) {

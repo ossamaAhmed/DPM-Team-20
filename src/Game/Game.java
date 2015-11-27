@@ -168,6 +168,7 @@ public class Game {
 		}
 		
 	}
+
 	public void searchTile(Tile suspectedTile){
 		//face the suspected tile
 		int robotTileX = (int) (this.myRobot.getPosition().getPositionX() / this.myField
@@ -209,7 +210,6 @@ public class Game {
 		}
 		usDist = USpoller.getDistance();
 		if (usDist < 0.25) {
-			Sound.beep();
 			inspectObject(suspectedTile,robotTileX,robotTileY);
 			Sound.beep();
 //			this.navigator.travelToBackwards(robotTileX*this.myField.getTileSize()-15,robotTileY*this.myField.getTileSize()-15 );
@@ -248,7 +248,6 @@ public class Game {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 	public void turnToTile(Tile suspectedTile){
 		int robotTileX = (int) (this.myRobot.getPosition().getPositionX() / this.myField

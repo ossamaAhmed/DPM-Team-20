@@ -1,3 +1,10 @@
+<<<<<<< HEAD
 /initializationRoutine/
+=======
+/navigationController/
+/initializationRoutine/
+/sensorController/
+/localizationRoutine/
+>>>>>>> 02bc454b42be1b521bc9f3387bb9ce66d75eb1d7
 /Game/
 /FieldMap/

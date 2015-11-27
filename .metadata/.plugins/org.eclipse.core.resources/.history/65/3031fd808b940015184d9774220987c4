@@ -1,0 +1,5 @@
+package FieldMap;
+
+public enum Zone {
+
+}
