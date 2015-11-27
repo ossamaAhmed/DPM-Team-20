@@ -1,6 +1,7 @@
 package initializationRoutine;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import navigationController.*;
 import lejos.hardware.Button;
@@ -14,9 +15,12 @@ import sensorController.FilteredUltrasonicPoller;
 import wifi.StartCorner;
 import wifi.Transmission;
 import wifi.WifiConnection;
+import FieldMap.Block;
 import FieldMap.Field;
 import FieldMap.Position;
 import FieldMap.Robot;
+import FieldMap.Tile;
+import FieldMap.Zone;
 import Game.Game;
 
 
@@ -50,38 +54,38 @@ public class Initialization {
 
 		TextLCD LCD = LocalEV3.get().getTextLCD();
 		LCD.drawString("Ready", 0, 0);
-		WifiConnection conn = null;
-		try {
-			conn = new WifiConnection(SERVER_IP, TEAM_NUMBER);
-		} catch (IOException e) {
-			System.out.println("Connection failed");
-		}
-		Transmission t = conn.getTransmission();
-		int homeZoneBL_X = 0;
-		int homeZoneBL_Y = 0;
-		int opponentHomeZoneBL_X = 0;
-		int opponentHomeZoneBL_Y =0;
-		int dropZone_X =0;
-		int dropZone_Y = 0;
-		int flagType =0;
-		int	opponentFlagType = t.opponentFlagType;
-		if (t == null) {
-			LCD.drawString("Failed to read transmission", 0, 5);
-
-		} else {
-			StartCorner corner = t.startingCorner;
-			 homeZoneBL_X = t.homeZoneBL_X;
-			 homeZoneBL_Y = t.homeZoneBL_Y;
-			 opponentHomeZoneBL_X = t.opponentHomeZoneBL_X;
-			 opponentHomeZoneBL_Y = t.opponentHomeZoneBL_Y;
-			 dropZone_X = t.dropZone_X;
-			 dropZone_Y = t.dropZone_Y;
-			 flagType = t.flagType;
-			 opponentFlagType = t.opponentFlagType;
-		
-			// print out the transmission information
-			conn.printTransmission();
-		}
+//		WifiConnection conn = null;
+//		try {
+//			conn = new WifiConnection(SERVER_IP, TEAM_NUMBER);
+//		} catch (IOException e) {
+//			System.out.println("Connection failed");
+//		}
+//		Transmission t = conn.getTransmission();
+//		int homeZoneBL_X = 0;
+//		int homeZoneBL_Y = 0;
+//		int opponentHomeZoneBL_X = 0;
+//		int opponentHomeZoneBL_Y =0;
+//		int dropZone_X =0;
+//		int dropZone_Y = 0;
+//		int flagType =0;
+//		int	opponentFlagType = t.opponentFlagType;
+//		if (t == null) {
+//			LCD.drawString("Failed to read transmission", 0, 5);
+//
+//		} else {
+//			StartCorner corner = t.startingCorner;
+//			 homeZoneBL_X = t.homeZoneBL_X;
+//			 homeZoneBL_Y = t.homeZoneBL_Y;
+//			 opponentHomeZoneBL_X = t.opponentHomeZoneBL_X;
+//			 opponentHomeZoneBL_Y = t.opponentHomeZoneBL_Y;
+//			 dropZone_X = t.dropZone_X;
+//			 dropZone_Y = t.dropZone_Y;
+//			 flagType = t.flagType;
+//			 opponentFlagType = t.opponentFlagType;
+//		
+//			// print out the transmission information
+//			conn.printTransmission();
+//		}
 		do {
 			buttonChoice = Button.waitForAnyPress();
 		}
@@ -134,41 +138,50 @@ public class Initialization {
 		else if (buttonChoice == Button.ID_DOWN) {
 			arm.raiseArm(0);
 			LCDInfo lcd = new LCDInfo(odo,usPoller,colorPoller);
-			USLocalizer myLoc= new USLocalizer(odo, usPoller, nav, drive, USLocalizer.LocalizationType.RISING_EDGE);
-			myLoc.doLocalization();
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			nav.travelToDiagonaly(15, 17);
-			nav.turnTo(0, true);
-			double[] newpos= {0,0,0};
-			boolean[] newbol= {true,true,true};
-			odo.setPosition(newpos, newbol);
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			nav.travelToDiagonaly((35/2.0), (35/2.0)+4);
-			nav.turnTo(0, true);
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+//			USLocalizer myLoc= new USLocalizer(odo, usPoller, nav, drive, USLocalizer.LocalizationType.RISING_EDGE);
+//			myLoc.doLocalization();
+//			try {
+//				Thread.sleep(5000);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			nav.travelToDiagonaly(15, 17);
+//			nav.turnTo(0, true);
+//			double[] newpos= {0,0,0};
+//			boolean[] newbol= {true,true,true};
+//			odo.setPosition(newpos, newbol);
+//			try {
+//				Thread.sleep(5000);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			nav.travelToDiagonaly((35/2.0), (35/2.0)+4);
+//			nav.turnTo(0, true);
+//			try {
+//				Thread.sleep(5000);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 //			odoC.start();
-			double[] newpos2= {(35/2.0)+35,(35/2.0)+35,0};
+			double[] newpos2= {(35/2.0)+35,(35/2.0)+35,90};
 			boolean[] newbol2= {true,true,true};
 			odo.setPosition(newpos2, newbol2);
 			Robot myRobot= new Robot(new Position((35/2.0)+35,(35/2.0)+35));
-			Field myField= new Field(8,8,35);
+			Field myField= new Field(5,3,35);
 			Game myGame= new Game(myRobot,myField, nav, usPoller);
-			myGame.moveRobot(opponentHomeZoneBL_X, opponentHomeZoneBL_Y);
+			ArrayList<Tile> myOpponentZoneTile= new ArrayList<Tile>();
+			myOpponentZoneTile.add(myField.getTile(2, 2));
+			myOpponentZoneTile.add(myField.getTile(1, 2));
+			myOpponentZoneTile.add(myField.getTile(1, 3));
+			myOpponentZoneTile.add(myField.getTile(2, 3));
+			for(Tile opponentTile : myOpponentZoneTile){
+				opponentTile.setZoneType(Zone.OPPONENT_ZONE);
+				opponentTile.setBlock(Block.BLOCKED);
+			}
+			myGame.searchZone(myOpponentZoneTile);
 
 		}
 
