@@ -75,8 +75,8 @@ public class Field {
 	 * @return it returns the tile at the x and y locations
 	 * @author Ossama Ahmed
 	 */
-	public Tile getTile(int x,int y){
-		return this.Map[x][y];
+	public Tile getTile(int y,int x){
+		return this.Map[y][x];
 	}
 	/** 
 	 * This method takes care of getting the list of the neighboring tiles to a specific tile
@@ -92,28 +92,28 @@ public class Field {
 			neighbouringTiles[0]= null;
 		}
 		else{
-			neighbouringTiles[0]= this.Map[x][y+1];
+			neighbouringTiles[0]= this.Map[y+1][x];
 		}
 		//getting the lower tile
 		if(y==0){
 			neighbouringTiles[1]= null;
 		}
 		else{
-			neighbouringTiles[1]= this.Map[x][y-1];
+			neighbouringTiles[1]= this.Map[y-1][x];
 		}
 		//getting the right tile
 		if(x==this.xTiles-1){
 			neighbouringTiles[2]= null;
 		}
 		else{
-			neighbouringTiles[2]= this.Map[x+1][y];
+			neighbouringTiles[2]= this.Map[y][x+1];
 		}
 		//getting the left tile 
 		if(x==0){
 			neighbouringTiles[3]= null;
 		}
 		else{
-			neighbouringTiles[3]= this.Map[x-1][y];
+			neighbouringTiles[3]= this.Map[y][x-1];
 		}
 		return neighbouringTiles;
 	}
