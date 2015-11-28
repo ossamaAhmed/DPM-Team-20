@@ -8,6 +8,7 @@ package Game;
  */
 import java.util.ArrayList;
 
+import motorController.DriveController;
 import navigationController.Navigator;
 import sensorController.FilteredUltrasonicPoller;
 import lejos.hardware.Sound;
@@ -17,6 +18,7 @@ public class Game {
 	/* Instance Variables*/
 	private Field myField;
 	private Robot myRobot;
+	private DriveController drive;
 	private Navigator navigator;
 	private FilteredUltrasonicPoller USpoller;
 	/** 
@@ -27,7 +29,7 @@ public class Game {
 	 * @param USpoller is the ultrasonic sensor that will be used in detecting the obstacles 
 	 * and blocking the tiles
 	 */
-	public Game(Robot myRobot,Field myField, Navigator navigator, FilteredUltrasonicPoller USpoller){
+	public Game(Robot myRobot,Field myField,DriveController drive, Navigator navigator, FilteredUltrasonicPoller USpoller){
 		this.myField= myField;
 		this.myRobot= myRobot;
 		this.navigator=navigator; 
@@ -170,18 +172,16 @@ public class Game {
 	}
 
 	public void searchTile(Tile suspectedTile){
-		//face the suspected tile
+		//Face the suspected tile
+		//
 		int robotTileX = (int) (this.myRobot.getPosition().getPositionX() / this.myField
 				.getTileSize());
 		int robotTileY = (int) (this.myRobot.getPosition().getPositionY() / this.myField
 				.getTileSize());
-		turnToTile(suspectedTile);
-		try {
-			Thread.sleep(300);
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		navigator.turnToTile(suspectedTile,myRobot,myField);
+		delay(300);
+		// First check for an object
+		//
 		float usDist = USpoller.getDistance();
 		this.navigator.goBackwards(8);
 		this.myRobot.setPosition(new Position(this.navigator.getCurrentX(),this.navigator.getCurrentY()));
@@ -190,83 +190,49 @@ public class Game {
 			inspectObject(suspectedTile,robotTileX,robotTileY);
 			Sound.beep();
 //			this.navigator.travelToBackwards(robotTileX*this.myField.getTileSize()-15,robotTileY*this.myField.getTileSize()-15 );
-			double[] myInitialPosition= {this.myField.getTile(robotTileY, robotTileX).getPosition().getPositionX(),
-					this.myField.getTile(robotTileY, robotTileX).getPosition().getPositionY()};
-			double[] myCurrentPosition= {this.navigator.getCurrentX(),
-					this.navigator.getCurrentY()};
-			double distanceToTravel= this.navigator.getCoordinateDistance(myCurrentPosition, myInitialPosition);
-			this.navigator.goBackwards(distanceToTravel);
+			navigator.travelBackToTile(robotTileY,robotTileX, myField);
 			return;
 		}
+		//
+		//
 		Sound.buzz();
+		// Move forward half a tile, and check again for an object
+		//
 		this.navigator.goForwardHalfTile(this.myField.getTileSize());
 		this.myRobot.setPosition(new Position(this.navigator.getCurrentX(),
 				this.navigator.getCurrentY()));
-		try {
-			Thread.sleep(200);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		delay(200);
 		usDist = USpoller.getDistance();
 		if (usDist < 0.25) {
 			inspectObject(suspectedTile,robotTileX,robotTileY);
 			Sound.beep();
 //			this.navigator.travelToBackwards(robotTileX*this.myField.getTileSize()-15,robotTileY*this.myField.getTileSize()-15 );
-			double[] myInitialPosition= {this.myField.getTile(robotTileY, robotTileX).getPosition().getPositionX(),
-					this.myField.getTile(robotTileY, robotTileX).getPosition().getPositionY()};
-			double[] myCurrentPosition= {this.navigator.getCurrentX(),
-					this.navigator.getCurrentY()};
-			double distanceToTravel= this.navigator.getCoordinateDistance(myCurrentPosition, myInitialPosition);
-			this.navigator.goBackwards(distanceToTravel);
+			navigator.travelBackToTile(robotTileY,robotTileX, myField);
 			return;
 		}
+		//
+		//
 		Sound.buzz();
-		double[] myInitialPosition= {this.myField.getTile(robotTileY, robotTileX).getPosition().getPositionX(),
-				this.myField.getTile(robotTileY, robotTileX).getPosition().getPositionY()};
-		double[] myCurrentPosition= {this.navigator.getCurrentX(),
-				this.navigator.getCurrentY()};
-		double distanceToTravel= this.navigator.getCoordinateDistance(myCurrentPosition, myInitialPosition);
-		this.navigator.goBackwards(distanceToTravel);
+		navigator.travelBackToTile(robotTileY,robotTileX, myField);
 		//search the tile for any objects 
 		//if object detected go search it and if an object was styrofoam just go 
 	}
 	public void inspectObject(Tile suspectedTile, int initialX,int initialY){
-		float usDist = USpoller.getDistance();
-		this.navigator.drive.setSpeeds(50, 50);
-		while(usDist>0.05){
-			usDist = USpoller.getDistance();
-		}
-		this.navigator.drive.setSpeeds(0,0);
+		navigator.goForwardUntilObject(0.05f, 25);
 		this.myRobot.setPosition(new Position(this.navigator.getCurrentX(),
 				this.navigator.getCurrentY()));
 		//poll the object and scan
 		
+		delay(2000);
+	}
+
+	
+	public void delay(long time) {
 		try {
-			Thread.sleep(2000);
+			Thread.sleep(time);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-	}
-	public void turnToTile(Tile suspectedTile){
-		int robotTileX = (int) (this.myRobot.getPosition().getPositionX() / this.myField
-				.getTileSize());
-		int robotTileY = (int) (this.myRobot.getPosition().getPositionY() / this.myField
-				.getTileSize());
-		int differenceX= robotTileX-suspectedTile.getTileIndexX();
-		int differenceY= robotTileY-suspectedTile.getTileIndexY();
-		if(differenceY==-1){
-			this.navigator.turnUp();
-		}
-		else if(differenceY==1){
-			this.navigator.turnDown();
-		}
-		else if(differenceX==-1){
-			this.navigator.turnRight();
-		}
-		else if(differenceX==1){
-			this.navigator.turnLeft();
 		}
 	}
 	
