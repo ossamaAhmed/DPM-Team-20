@@ -6,9 +6,15 @@ package FieldMap;
  * Fall 2015
  * aStarAlgorithm class provides the methods used in the path finding and navigating of the robot
  */
+
+
 import java.util.ArrayList;
 import java.util.Stack;
 
+/**
+aStarAlgorithm class provides the methods used in the path finding and navigating of the robot
+ *
+ */
 public class aStarAlgorithm {
 	
 	/**

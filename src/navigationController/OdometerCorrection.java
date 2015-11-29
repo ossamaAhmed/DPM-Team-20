@@ -1,8 +1,11 @@
-package navigationController;
-
-import lejos.hardware.Sound;
+package navigationController; 
 import sensorController.FilteredColorPoller;
 
+/**
+ * This thread looks for grid lines and corrects the odometer
+ * @author tcv
+ *
+ */
 public class OdometerCorrection extends Thread {
 	//Resources
 	private Odometer odo;

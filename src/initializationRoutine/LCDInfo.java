@@ -7,6 +7,10 @@ import lejos.hardware.lcd.TextLCD;
 import lejos.utility.Timer;
 import lejos.utility.TimerListener;
 
+/**
+ * This class draws sensor information on the display
+ *
+ */
 public class LCDInfo implements TimerListener{
 	public static final int LCD_REFRESH = 200;
 	private Odometer odo;

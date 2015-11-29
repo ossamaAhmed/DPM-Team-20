@@ -7,6 +7,11 @@ package FieldMap;
  * Robot class represents the robot used on the field 
  */
 
+
+/**
+ * Robot class represents the robot used on the field 
+ *
+ */
 public class Robot {
 	
 	/* Instance Variables*/

@@ -7,9 +7,16 @@ package sensorController;
  * MaxValueFilter class is responsible for the implementation of the maximum value filter
  * for the ultrasonic readings
  */
+
+
 import lejos.robotics.SampleProvider;
 import lejos.robotics.filter.AbstractFilter;
 
+/**
+ * MaxValueFilter class is responsible for the implementation of the maximum value filter
+ * for the ultrasonic readings
+ *
+ */
 public class MaxValueFilter extends AbstractFilter {
 	/* Instance Variables*/
 	float[] sample;

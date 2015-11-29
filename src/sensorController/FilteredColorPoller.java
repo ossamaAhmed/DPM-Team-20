@@ -7,6 +7,7 @@ package sensorController;
  * Fall 2015
  * FilteredColorPoller class is responsible for getting filtered readings from the color sensor
  */
+
 import lejos.hardware.*;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.port.Port;
@@ -15,6 +16,10 @@ import lejos.hardware.sensor.SensorModes;
 import lejos.robotics.SampleProvider;
 import lejos.robotics.filter.MedianFilter;
 
+/**
+ * FilteredColorPoller class is responsible for getting filtered readings from the color sensor
+ *
+ */
 public class FilteredColorPoller extends Thread {
 
 	// Resources

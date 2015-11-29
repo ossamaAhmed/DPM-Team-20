@@ -7,6 +7,11 @@ package FieldMap;
  * Position class represents the (x,y) coordinates on the map
  */
 
+
+/**
+ * Position class represents the (x,y) coordinates on the map
+ *
+ */
 public class Position {
 	
 	/* Instance Variables*/

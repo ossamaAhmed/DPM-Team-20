@@ -207,8 +207,6 @@ public class Odometer implements TimerListener {
 	
 	/**
 	 * Getter method for the current robot position
-	 * @param position An array corresponding to the x,y,and theta (degrees) values
-	 * respectively
 	 */
 
 	public double[] getPosition() {

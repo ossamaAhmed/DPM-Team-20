@@ -54,6 +54,9 @@ public class ArmController {
 		armMotor[index].rotate(angle);
 	}
 	
+	/**
+	 * This method changes the angle of the arms to the predefined capture angles
+	 */
 	public void captureObject(){
 		raiseArmTo(0,captureAngle[0]);
 		raiseArmTo(1,captureAngle[1]);

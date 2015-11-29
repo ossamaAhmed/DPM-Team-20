@@ -24,6 +24,10 @@ import FieldMap.Tile;
 import FieldMap.Zone;
 import Game.Game;
 
+/**
+ * Performs the initialization routine of the robot
+ *
+ */
 public class Initialization {
 
 	//	private static final String SERVER_IP = "192.168.10.200";

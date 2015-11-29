@@ -7,6 +7,12 @@ package FieldMap;
  * Task class is an enum that represents the tasks that will be returned to the 
  * robot to perform, tasks understood by the robot are MOVEUP,MOVEDOWN,MOVERIGHT,MOVELEFT
  */
+
+/**
+ * Task class is an enum that represents the tasks that will be returned to the 
+ * robot to perform, tasks understood by the robot are MOVEUP,MOVEDOWN,MOVERIGHT,MOVELEFT
+ *
+ */
 public enum Task {
 	MOVEUP,MOVEDOWN,MOVERIGHT,MOVELEFT
 }

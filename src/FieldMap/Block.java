@@ -6,6 +6,13 @@ package FieldMap;
  * Fall 2015
  * Block class represents an enum that represents if a tile is blocked or not
  */
+
+
+
+/**
+ * Block class represents an enum that represents if a tile is blocked or not
+ *
+ */
 public enum Block {
 	BLOCKED, UNBLOCKED
 }

@@ -4,7 +4,14 @@ package FieldMap;
  * Written by: Ossama Ahmed
  * ECSE 211 - Design Principles and Methods
  * Fall 2015
+ * 
  * Field class represents the physical map (NxM) matrix 
+ */
+
+
+/**
+ * Field class represents the physical map (NxM) matrix 
+ *
  */
 public class Field {
 	

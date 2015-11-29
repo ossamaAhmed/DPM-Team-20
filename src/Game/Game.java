@@ -6,6 +6,7 @@ package Game;
  * Fall 2015
  * Game class is the responsible for initiating the game of catch the flag 
  */
+
 import java.util.ArrayList;
 
 import motorController.DriveController;
@@ -14,6 +15,10 @@ import sensorController.FilteredUltrasonicPoller;
 import lejos.hardware.Sound;
 import FieldMap.*;
 
+/**
+ * Game class is the responsible for initiating the game of catch the flag 
+ *
+ */
 public class Game {
 	/* Instance Variables*/
 	private Field myField;
@@ -153,6 +158,11 @@ public class Game {
 		return true;
 		
 	}
+	/**
+	 * This method moves the robot around the outside of the Opponent Zone, scans for objects, and attempts to identify the
+	 * opponent flag.
+	 * @param suspectedTileList The ArrayList of Tiles corresponding to the Opponent Zone
+	 */
 	public void searchZone(ArrayList<Tile> suspectedTileList){
 		for (Tile suspectedTile : suspectedTileList ){
 			Tile[] myNeighbors = this.myField.getNeighbouringTiles(suspectedTile.getTileIndexX(), suspectedTile.getTileIndexY());
@@ -171,6 +181,11 @@ public class Game {
 		
 	}
 
+	/**
+	 * This method searches the given tile for objects. First it takes an initial scan, if no object is found it moves the robot
+	 * forward and takes another scan. Lastly, it returns the robot to it's position prior to the search.
+	 * @param suspectedTile The tile to look for objects in.
+	 */
 	public void searchTile(Tile suspectedTile){
 		//Face the suspected tile
 		//
@@ -217,6 +232,9 @@ public class Game {
 		//search the tile for any objects 
 		//if object detected go search it and if an object was styrofoam just go 
 	}
+	/**
+	 * Moves the robot forward until the ultrasonic sensor detects an object.
+	 */
 	public void inspectObject(Tile suspectedTile, int initialX,int initialY){
 		navigator.goForwardUntilObject(0.05f, 25);
 		this.myRobot.setPosition(new Position(this.navigator.getCurrentX(),
@@ -227,6 +245,10 @@ public class Game {
 	}
 
 	
+	/**
+	 * Helper method which sleeps the thread for a given time
+	 * @param time The time to sleep the thread
+	 */
 	public void delay(long time) {
 		try {
 			Thread.sleep(time);

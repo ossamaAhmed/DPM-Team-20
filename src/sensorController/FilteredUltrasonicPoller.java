@@ -7,6 +7,7 @@ package sensorController;
  * FilteredUltrasonicPoller class is responsible for getting filtered readings from the ultrasonic sensor
  */
 
+
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.port.Port;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
@@ -15,6 +16,10 @@ import lejos.robotics.SampleProvider;
 import lejos.robotics.filter.MedianFilter;
 
 
+/**
+ * FilteredUltrasonicPoller class is responsible for getting filtered readings from the ultrasonic sensor
+ *
+ */
 public class FilteredUltrasonicPoller extends Thread {
 	
 	//Resources

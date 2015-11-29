@@ -84,6 +84,12 @@ public class Navigator extends Thread {
 		delay(delayAmount);
 	}
 
+	/**
+	 * This method turns away from a (x,y) coordinate and then travels backwards in a straight
+	 * line until the destination
+	 * @param x The desired X coordinate
+	 * @param y The desired Y coordinate
+	 */
 	public void travelToBackwards(double x, double y) {
 		drive.setSpeeds(0, 0);
 		delay(delayAmount);
@@ -110,6 +116,12 @@ public class Navigator extends Thread {
 		delay(delayAmount);
 	}
 	
+	/**
+	 * This method makes the robot travels in a straight line backwards depending on the distance to a given tile.
+	 * @param robotTileY The Y coordinate of the tile
+	 * @param robotTileX The X coordinate of the tile
+	 * @param myField The field to which the tile belongs
+	 */
 	public void travelBackToTile(int robotTileY, int robotTileX, Field myField){
 		double[] myInitialPosition= {myField.getTile(robotTileY, robotTileX).getPosition().getPositionX(),
 				myField.getTile(robotTileY, robotTileX).getPosition().getPositionY()};
@@ -119,6 +131,11 @@ public class Navigator extends Thread {
 		goBackwards(distanceToTravel);
 	}
 	
+	/**
+	 * This method makes the robot travel forward until the ultrasonic sensor detects and object.
+	 * @param detectionDistance The detection threshold distance
+	 * @param timeOutDistance The distance to timeout after travelling
+	 */
 	public void goForwardUntilObject(float detectionDistance, double timeOutDistance){
 		drive.setSpeeds(0, 0);
 		delay(delayAmount);
@@ -139,10 +156,7 @@ public class Navigator extends Thread {
 	}
 	
 
-	/*
-	 * TurnTo function which takes an angle and boolean as arguments The boolean controls whether or not to stop the
-	 * motors when the turn is completed
-	 */
+
 	/**
 	 * This method turns the robot towards a given degree angle (where 0 degrees is east)
 	 * @param angle The desired degree angle to turn to
@@ -174,6 +188,12 @@ public class Navigator extends Thread {
 
 	}
 	
+	/**
+	 * Turns the robot towards a given tile
+	 * @param suspectedTile The tile to turn to
+	 * @param myRobot The robot to turn and position to update
+	 * @param myField The field to which the tile belongs
+	 */
 	public void turnToTile(Tile suspectedTile, Robot myRobot, Field myField){
 		int robotTileX = (int) (myRobot.getPosition().getPositionX() / myField
 				.getTileSize());
@@ -211,6 +231,10 @@ public class Navigator extends Thread {
 
 	}
 
+	/**
+	 * This method moves the robot backwards a given distance in cm
+	 * @param distance The desired distance to move forward in cm
+	 */
 	public void goBackwards(double distance) {
 		if (distance >= 0) {
 			this.travelToBackwards(odo.getX() - Math.cos(Math.toRadians(this.odo.getAng())) * distance, odo.getY() - Math.sin(Math.toRadians(this.odo.getAng())) * distance);
@@ -299,6 +323,10 @@ public class Navigator extends Thread {
 		return distance;
 	}
 
+	/**
+	 * Helper method which sleeps the thread for a given time.
+	 * @param time The time to sleep the thread
+	 */
 	public void delay(long time) {
 		try {
 			Thread.sleep(time);
@@ -308,6 +336,12 @@ public class Navigator extends Thread {
 		}
 	}
 	
+	/**
+	 * This method returns the distance from a coordinate to the robots current position/
+	 * @param x The x coordinate to compare to
+	 * @param y The y coordinate to compare to
+	 * @return The distance from the robot
+	 */
 	public double getDistanceFromRobot(double x, double y) {
 		double dx = x - odo.getX();
 		double dy = y - odo.getY();

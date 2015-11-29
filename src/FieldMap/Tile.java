@@ -7,7 +7,14 @@
  * navigating in; a tile can be blocked by a block or unblocked. 
  * this class also is used to calculate the shortest path between two tiles
  */
+
 package FieldMap;
+/**
+ * Tile class represents the physical tile in the field that's the robot is 
+ * navigating in; a tile can be blocked by a block or unblocked. 
+ * this class also is used to calculate the shortest path between two tiles
+ *
+ */
 public class Tile {
 	
 	/* Instance Variables*/
