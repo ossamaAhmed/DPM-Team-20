@@ -20,12 +20,12 @@ import motorController.DriveController;
  * controls navigation and general robot movement
  *
  */
-public class Navigator extends Thread {
-	final int FAST = 100;
+public class Navigator{
+	final int FAST = 200;
 	final int SLOW = 100;
 	final long delayAmount = 200;
 	static final int ACCELERATION = 1500;
-	final static double DEG_ERR = 3.0, CM_ERR = 3.0;
+	final static double DEG_ERR = 3.0, CM_ERR = 1.0;
 	private Odometer odo;
 	public volatile boolean correctionFlag = false;
 	public DriveController drive;
@@ -44,7 +44,6 @@ public class Navigator extends Thread {
 		this.colorPoller = colorPoller;
 		this.odoC = odoC;
 		this.drive.setAcceleration(ACCELERATION);
-		this.start();
 	}
 
 
@@ -85,7 +84,7 @@ public class Navigator extends Thread {
 		delay(delayAmount);
 
 		double distance = getDistanceFromRobot(x, y);
-		adjustHeading(x, y, false);
+		adjustHeading(x, y, false,false);
 
 		while (distance > CM_ERR) {
 			if (odoC.doCorrectionRoutine()) {
@@ -95,7 +94,7 @@ public class Navigator extends Thread {
 			}
 
 			else {
-				adjustHeading(x, y, true);
+				adjustHeading(x, y, true,false);
 				drive.setSpeeds(FAST, FAST);
 				distance = getDistanceFromRobot(x, y);
 
@@ -109,24 +108,16 @@ public class Navigator extends Thread {
 		drive.setSpeeds(0, 0);
 		delay(delayAmount);
 
-		double minAng;
-		minAng = (Math.atan2(y - odo.getY(), x - odo.getX())) * (180.0 / Math.PI);
-		if (minAng < 0)
-			minAng += 360.0;
-		minAng += 180;
+		double distance = getDistanceFromRobot(x, y);
+		adjustHeading(x, y, false,false);
 
-		this.turnTo(minAng, true);
-		drive.setSpeeds(-1 * FAST, -1 * FAST);
-
-		double dx = x - odo.getX();
-		double dy = y - odo.getY();
-		double distance = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
 		while (distance > CM_ERR) {
-			dx = x - odo.getX();
-			dy = y - odo.getY();
-			distance = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
-		}
+		
+				adjustHeading(x, y, true,false);
+				drive.setSpeeds(-1*FAST, -1*FAST);
+				distance = getDistanceFromRobot(x, y);
 
+		}
 		drive.setSpeeds(0, 0);
 		delay(delayAmount);
 	}
@@ -278,13 +269,13 @@ public class Navigator extends Thread {
 		}
 	}
 
-	public void adjustHeading(double x, double y, boolean checkDegError) {
+	public void adjustHeading(double x, double y, boolean checkDegError, boolean backwards) {
 		double minAng;
 		minAng = (Math.atan2(y - odo.getY(), x - odo.getX())) * (180.0 / Math.PI);
 		if (minAng < 0)
 			minAng += 360.0;
-		minAng += 180;
 
+		if (backwards) minAng += 180;
 		// If checkDegError = true, only turn if minAng > DEG_ERR
 		if (checkDegError) {
 			if (getAngleDistance(minAng, odo.getAng()) > DEG_ERR)
@@ -316,9 +307,5 @@ public class Navigator extends Thread {
 		return result;
 	}
 
-	public void start() {
-		// Nothing needs to run here
-
-	}
 
 }

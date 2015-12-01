@@ -16,6 +16,8 @@ public class DriveController {
 
 	public DriveController() {
 		drivingMotor[0].synchronizeWith(new EV3LargeRegulatedMotor[] { drivingMotor[1] });
+		drivingMotor[0].resetTachoCount();
+		drivingMotor[1].resetTachoCount();
 
 	}
 

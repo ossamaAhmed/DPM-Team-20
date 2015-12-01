@@ -7,6 +7,7 @@ import lejos.hardware.Button;
 import lejos.hardware.Sound;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;
+import localizationRoutine.LightLocalizer;
 import localizationRoutine.USLocalizer;
 import motorController.ArmController;
 import motorController.DriveController;
@@ -21,7 +22,7 @@ import FieldMap.Robot;
 import Game.Game;
 
 
-public class Initialization {
+public class Initializationn {
 	
 //	private static final String SERVER_IP = "192.168.10.200";
 	private static final String SERVER_IP = "192.168.43.83";
@@ -40,6 +41,8 @@ public class Initialization {
 		Odometer odo = new Odometer(drive);
 		OdometerCorrection odoC = new OdometerCorrection(odo,colorPoller,drive);
 		Navigator nav = new Navigator(odo,odoC,drive,colorPoller);
+		USLocalizer usLoc= new USLocalizer(odo, usPoller, nav, drive, USLocalizer.LocalizationType.RISING_EDGE);
+		LightLocalizer lightLoc = new LightLocalizer(nav, odo, drive, colorPoller); 
 		
 
 		// User Interface
@@ -54,6 +57,8 @@ public class Initialization {
 
 		TextLCD LCD = LocalEV3.get().getTextLCD();
 		LCD.drawString("Ready", 0, 0);
+		Sound.beep();
+		arm.raiseArm(0);
 		initWifi();
 		
 		// New Command Line Initialization from console
@@ -72,7 +77,8 @@ public class Initialization {
 					case "localize": {
 						arm.raiseArm(0);
 						USLocalizer myLoc= new USLocalizer(odo, usPoller, nav, drive, USLocalizer.LocalizationType.RISING_EDGE);
-						myLoc.doLocalization();			
+						myLoc.doLocalization();
+						odo.setAng(odo.getAng()+90*((t.startingCorner.getId())-1));
 					}
 					
 					case "navToZone": {
@@ -116,19 +122,23 @@ public class Initialization {
 		
 		// Left Button
 		if (buttonChoice == Button.ID_LEFT) {
-			arm.raiseArm(0);
-			USLocalizer myLoc= new USLocalizer(odo, usPoller, nav, drive, USLocalizer.LocalizationType.RISING_EDGE);
-			myLoc.doLocalization();
+			drive.setFloat();
+			while (true){
+			System.out.println("Sensor 1: " + (int)(100*colorPoller.getReadingOf(1)));
+			System.out.println("Sensor 2: " + (int)(100*colorPoller.getReadingOf(2)));
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			}
 		}
 
 		// Right Button
 		else if (buttonChoice == Button.ID_RIGHT) {
-			arm.raiseArm(0);
-			odoC.run = true;
-			nav.travelTo(70, 0);
-			nav.travelTo(70, 70);
-			nav.travelTo(0,70);
-			nav.travelTo(0,0);
+			usLoc.doLocalization();
+			lightLoc.doLocalization();
 			
 
 		}
@@ -156,45 +166,16 @@ public class Initialization {
 		// Down Button
 		else if (buttonChoice == Button.ID_DOWN) {
 			arm.raiseArm(0);
-			LCDInfo lcd = new LCDInfo(odo,usPoller,colorPoller);
-			USLocalizer myLoc= new USLocalizer(odo, usPoller, nav, drive, USLocalizer.LocalizationType.RISING_EDGE);
-			myLoc.doLocalization();
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			odoC.run = true;
+			for (int i =0;i<10;i++){
+			nav.travelTo(60, 0);
+			nav.travelTo(60, 60);
+			nav.travelTo(0, 60);
+			nav.travelTo(0, 0);
 			}
-			nav.travelTo(15, 17);
-			nav.turnTo(0, true);
-			double[] newpos= {0,0,0};
-			boolean[] newbol= {true,true,true};
-			odo.setPosition(newpos, newbol);
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			nav.travelTo((35/2.0), (35/2.0)+4);
-			nav.turnTo(0, true);
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-//			odoC.start();
-			double[] newpos2= {(35/2.0)+35,(35/2.0)+35,0};
-			boolean[] newbol2= {true,true,true};
-			odo.setPosition(newpos2, newbol2);
-			Robot myRobot= new Robot(new Position((35/2.0)+35,(35/2.0)+35));
-			Field myField= new Field(8,8,35);
-			Game myGame= new Game(myRobot,myField, nav, usPoller);
-			myGame.moveRobot(t.opponentHomeZoneBL_X, t.opponentHomeZoneBL_Y);
+		}
+		}
 
-		}
-		}
 
 	}
 	
