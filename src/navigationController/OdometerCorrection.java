@@ -184,6 +184,46 @@ public class OdometerCorrection {
 		System.out.println("Number to round:"+numberToRound+  "  Result: " +result);
 		return result;
 	}
+	
+	public boolean checkIfGap()
+	{
+		double newX = 0;
+		double newY = 0;
+		double currentX = odo.getX();
+		double currentY = odo.getY();
+		
+		double roundedX = roundToNearestMultipleOf(latchedPos[0],30);
+		
+		int direction = getDirection();
+		switch (direction) {
+		case 1: {
+			newY = roundToNearestMultipleOf((currentY-distanceOfSensor), 30);
+			break;
+
+		}
+		case 2: {
+			newY = roundToNearestMultipleOf(currentY+(distanceOfSensor), 30);
+			break;
+		}
+		case 3: {
+			newX = roundToNearestMultipleOf((currentX-distanceOfSensor), 30);
+			break;
+			
+
+		}
+		case 4: {
+			newX = roundToNearestMultipleOf((currentX+distanceOfSensor), 30);
+			break;
+		}
+		}
+		
+		if ((newX % 120) == 0 || (newY % 120 == 0) ){
+			return true;
+			
+		}
+		
+		return false;
+	}
 
 	public void delay(long time) {
 		try {
