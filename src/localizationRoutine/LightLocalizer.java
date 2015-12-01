@@ -1,5 +1,6 @@
 package localizationRoutine;
 
+import lejos.hardware.Sound;
 import motorController.DriveController;
 import navigationController.Navigator;
 import navigationController.Odometer;
@@ -12,11 +13,11 @@ public class LightLocalizer {
 	private DriveController drive;
 	private FilteredColorPoller colorPoller;
 	// Variables
-	private static final float lineIntensity = 0.65f;
+	private static final float lineIntensity = 0.70f;
 	private static final double sensorDistance = 9;
 	private static final int abortAngle = 30;
 
-	public LightLocalizer(Navigator nav,Odometer odo, DriveController drive, FilteredColorPoller colorPoller) {
+	public LightLocalizer(Navigator nav, Odometer odo, DriveController drive, FilteredColorPoller colorPoller) {
 		this.nav = nav;
 		this.odo = odo;
 		this.drive = drive;
@@ -24,22 +25,27 @@ public class LightLocalizer {
 	}
 
 	public void doLocalization() {
-		drive.setSpeeds(drive.FAST, drive.FAST);
-		while (!lineDetected(1) && !lineDetected(2)) {
+		drive.setSpeeds(drive.SLOW, drive.SLOW);
+		while (!lineDetected(1) || !lineDetected(2)) {
 
 		}
+		doAllignRobot();
+		odo.setAng(0);
 		drive.setSpeeds(0, 0);
-		nav.goBackwards(sensorDistance);
+		nav.goBackwards(sensorDistance+1);
 		nav.turnUp();
-		drive.setSpeeds(drive.FAST, drive.FAST);
-		while (!lineDetected(1) && !lineDetected(2)) {
+		drive.setSpeeds(drive.SLOW, drive.SLOW);
+		while (!lineDetected(1) || !lineDetected(2)) {
 
 		}
-		nav.goBackwards(sensorDistance);
+		doAllignRobot();
+		odo.setAng(90);
+		nav.goBackwards(sensorDistance+1);
 		drive.setSpeeds(0, 0);
-		double[] updatePos = { 30,30,90};
+		double[] updatePos = { 30, 30, 90 };
 		boolean[] updateBoolean = { true, true, true };
 		odo.setPosition(updatePos, updateBoolean);
+		nav.turnTo(0, true);
 
 	}
 
@@ -53,7 +59,7 @@ public class LightLocalizer {
 		}
 
 	}
-	
+
 	public boolean doAllignRobot() {
 		double initAngle = odo.getAng();
 		boolean[] sensorIsOnLine = new boolean[3];
@@ -66,11 +72,12 @@ public class LightLocalizer {
 				drive.setSpeeds(drive.SLOW, 0);
 			sensorIsOnLine[1] = lineDetected(1);
 			sensorIsOnLine[2] = lineDetected(2);
-			if (Math.abs(odo.minimumAngleFromTo(odo.getAng(),initAngle)) > abortAngle){
+			if (Math.abs(odo.minimumAngleFromTo(odo.getAng(), initAngle)) > abortAngle) {
 				System.out.println("Aborting allignRobot");
+				Sound.buzz();
+				nav.turnTo(initAngle, true);
 				return false;
-				
-				
+
 			}
 
 		}

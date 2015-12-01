@@ -21,9 +21,9 @@ import motorController.DriveController;
  *
  */
 public class Navigator{
-	final int FAST = 200;
+	final int FAST = 150;
 	final int SLOW = 100;
-	final long delayAmount = 200;
+	final long delayAmount = 100;
 	static final int ACCELERATION = 1500;
 	final static double DEG_ERR = 3.0, CM_ERR = 1.0;
 	private Odometer odo;
@@ -109,11 +109,11 @@ public class Navigator{
 		delay(delayAmount);
 
 		double distance = getDistanceFromRobot(x, y);
-		adjustHeading(x, y, false,false);
+		adjustHeading(x, y, false,true);
 
 		while (distance > CM_ERR) {
 		
-				adjustHeading(x, y, true,false);
+				adjustHeading(x, y, true,true);
 				drive.setSpeeds(-1*FAST, -1*FAST);
 				distance = getDistanceFromRobot(x, y);
 
