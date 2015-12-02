@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import motorController.ArmController;
 import navigationController.Navigator;
 import navigationController.OdometerCorrection;
+import sensorController.FilteredColorPoller;
 import sensorController.FilteredUltrasonicPoller;
 import lejos.hardware.Sound;
 import FieldMap.*;
@@ -21,9 +22,13 @@ public class Game {
 	private Robot myRobot;
 	private Navigator navigator;
 	private FilteredUltrasonicPoller USpoller;
+	private FilteredColorPoller ColorPoller;
+
 	private final double distanceUltraSonic= 9;
 	private ArmController myArm;
 	private  OdometerCorrection odoC;
+	private static final int armAngleL[] = {110,0}; // The required rotation to raise or lower the arm
+	private static final int captureAngle[] = {110,-110}; // The required rotation to raise or lower the arm
 	/** 
 	 * Constructor
 	 * This method takes care of initializing the game object 
@@ -32,13 +37,14 @@ public class Game {
 	 * @param USpoller is the ultrasonic sensor that will be used in detecting the obstacles 
 	 * and blocking the tiles
 	 */
-	public Game(Robot myRobot,Field myField, Navigator navigator, FilteredUltrasonicPoller USpoller, ArmController arm, OdometerCorrection odoC){
+	public Game(Robot myRobot,Field myField, Navigator navigator, FilteredUltrasonicPoller USpoller, ArmController arm, OdometerCorrection odoC,FilteredColorPoller colorPoller){
 		this.myField= myField;
 		this.myRobot= myRobot;
 		this.navigator=navigator; 
 		this.USpoller= USpoller;
 		this.myArm=arm;
 		this.odoC= odoC;
+		this.ColorPoller=colorPoller;
 		this.odoC.run=false;
 	}
 	/** 
@@ -53,7 +59,8 @@ public class Game {
 
 		Task[]path= aStarAlgorithm.aStar(myField.getTiles(), robotTileX,robotTileY, tileX,tileY);
 		ArrayList<Tile> tilesToBeUnBlocked= new ArrayList<Tile>();
-		path = pathGenerator(path, robotTileX,robotTileY, tileX,tileY,tilesToBeUnBlocked);
+		path = pathGenerator(path, robotTileX,robotTileY, tileX,tileY,tilesToBeUnBlocked,3);
+		if(path==null) return;
 		for(int i=0;i< path.length;i++){
 			//update the robot's position
 			try {
@@ -75,7 +82,7 @@ public class Game {
 				robotTileX= (int) (this.myRobot.getPosition().getPositionX()/this.myField.getTileSize());
 				robotTileY= (int) (this.myRobot.getPosition().getPositionY()/this.myField.getTileSize());
 				path= aStarAlgorithm.aStar(myField.getTiles(), robotTileX,robotTileY, tileX,tileY);
-				path = pathGenerator(path, robotTileX,robotTileY, tileX,tileY,tilesToBeUnBlocked);
+				path = pathGenerator(path, robotTileX,robotTileY, tileX,tileY,tilesToBeUnBlocked,3);
 				i=-1;
 			}
 		}
@@ -192,7 +199,8 @@ public class Game {
 		
 	}
 	public void searchZone(ArrayList<Tile> suspectedTileList){
-		for (Tile suspectedTile : suspectedTileList ){
+		while(suspectedTileList.size()>0){
+			Tile suspectedTile= chooseSuspectedTile(suspectedTileList);
 			System.out.println("Suspected Tile is "+suspectedTile.getTileIndexX() + "    "+ suspectedTile.getTileIndexY() );
 			Tile[] myNeighbors = this.myField.getNeighbouringTiles(suspectedTile.getTileIndexX(), suspectedTile.getTileIndexY());
 			Tile goToTile= null;
@@ -205,7 +213,19 @@ public class Game {
 			}
 			System.out.println("Going To "+goToTile.getTileIndexX()+"   " +goToTile.getTileIndexY());
 			moveRobot(goToTile.getTileIndexX(),goToTile.getTileIndexY());
-			searchTile(suspectedTile);
+			if(searchTile(suspectedTile)){
+				moveRobot(this.myField.xHomeZone,this.myField.yHomeZone);
+				navigator.goBackwards(10);
+				myArm.raiseArmTo(0, captureAngle[0]);
+				myArm.raiseArmTo(1, captureAngle[1]);
+				myArm.raiseArm(0);
+				Sound.beepSequenceUp();
+				break;
+			}
+			else{
+				suspectedTileList.remove(suspectedTile);
+			}
+			
 //			try {
 //				Thread.sleep(200);
 //			} catch (InterruptedException e) {
@@ -221,9 +241,9 @@ public class Game {
 //				searchIntersention(suspectedTile,Task.MOVELEFT);
 //			}
 		}
-		
-		
 	}
+		
+		
 	//This method is implemented only for search tile right
 	public void searchIntersention(Tile suspectedTile, Task myTask){
 		int robotTileX = (int) (this.myRobot.getPosition().getPositionX() / this.myField
@@ -285,12 +305,19 @@ public class Game {
 		return;
 	}
 	
-	public void searchTile(Tile suspectedTile){
+	public boolean searchTile(Tile suspectedTile){
 		//face the suspected tile
+		boolean returnValue=false;
+		this.odoC.run= false;
+		//center the robot if it's not centered
 		int robotTileX = (int) (this.myRobot.getPosition().getPositionX() / this.myField
 				.getTileSize());
 		int robotTileY = (int) (this.myRobot.getPosition().getPositionY() / this.myField
 				.getTileSize());
+		this.navigator.travelTo(this.myField.getTile(robotTileY, robotTileX).getPosition().getPositionX(),
+								this.myField.getTile(robotTileY, robotTileX).getPosition().getPositionY());
+	//update the robot's position
+		this.odoC.run=true;
 		turnToTile(suspectedTile);
 		try {
 			Thread.sleep(300);
@@ -298,12 +325,12 @@ public class Game {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		this.navigator.goBackwards(distanceUltraSonic);
-		this.myRobot.setPosition(new Position(this.navigator.getCurrentX(),this.navigator.getCurrentY()));
+//		this.navigator.goBackwards(distanceUltraSonic);
+//		this.myRobot.setPosition(new Position(this.navigator.getCurrentX(),this.navigator.getCurrentY()));
 		float usDist = USpoller.getDistance();
-		if (usDist < 0.25) {
+		if (usDist < 0.20) {
 			Sound.beep();
-			inspectObject(suspectedTile,robotTileX,robotTileY);
+			returnValue= inspectObject(suspectedTile,robotTileX,robotTileY);
 			Sound.beep();
 			double[] myInitialPosition= {this.myField.getTile(robotTileY, robotTileX).getPosition().getPositionX(),
 					this.myField.getTile(robotTileY, robotTileX).getPosition().getPositionY()};
@@ -312,7 +339,7 @@ public class Game {
 			double distanceToTravel= this.navigator.getCoordinateDistance(myCurrentPosition, myInitialPosition);
 			this.navigator.goBackwards(distanceToTravel);
 			this.myRobot.setPosition(new Position(this.navigator.getCurrentX(),this.navigator.getCurrentY()));
-			return;
+			return returnValue;
 		}
 		Sound.buzz();
 		this.navigator.goForwardHalfTile(this.myField.getTileSize());
@@ -327,7 +354,7 @@ public class Game {
 		usDist = USpoller.getDistance();
 		if (usDist < 0.25) {
 			Sound.beep();
-			inspectObject(suspectedTile,robotTileX,robotTileY);
+			returnValue= inspectObject(suspectedTile,robotTileX,robotTileY);
 			double[] myInitialPosition= {this.myField.getTile(robotTileY, robotTileX).getPosition().getPositionX(),
 					this.myField.getTile(robotTileY, robotTileX).getPosition().getPositionY()};
 			double[] myCurrentPosition= {this.navigator.getCurrentX(),
@@ -335,7 +362,7 @@ public class Game {
 			double distanceToTravel= this.navigator.getCoordinateDistance(myCurrentPosition, myInitialPosition);
 			this.navigator.goBackwards(distanceToTravel);
 			this.myRobot.setPosition(new Position(this.navigator.getCurrentX(),this.navigator.getCurrentY()));
-			return;
+			return returnValue;
 		}
 		Sound.buzz();
 		double[] myInitialPosition= {this.myField.getTile(robotTileY, robotTileX).getPosition().getPositionX(),
@@ -345,22 +372,67 @@ public class Game {
 		double distanceToTravel= this.navigator.getCoordinateDistance(myCurrentPosition, myInitialPosition);
 		this.navigator.goBackwards(distanceToTravel);
 		this.myRobot.setPosition(new Position(this.navigator.getCurrentX(),this.navigator.getCurrentY()));
+		return returnValue;
 		//search the tile for any objects 
 		//if object detected go search it and if an object was styrofoam just go 
 	}
-	public void inspectObject(Tile suspectedTile, int initialX,int initialY){
+//	public boolean inspectObject(Tile suspectedTile, int initialX,int initialY){
+//		boolean returnValue=true;
+//		float usDist = USpoller.getDistance();
+//		this.navigator.drive.setSpeeds(50, 50);
+//		double initialPositionX= this.navigator.getCurrentX();
+//		double initialPositionY= this.navigator.getCurrentY();
+//		while(usDist>0.05){
+//			usDist = USpoller.getDistance();
+//			double distanceTravelled= Math.sqrt(Math.pow(initialPositionX-this.navigator.getCurrentX(), 2)+Math.pow(initialPositionY-this.navigator.getCurrentY(), 2));
+//			if(distanceTravelled>25){ 
+//				returnValue=false;
+//				break;
+//				}
+//		}
+//		this.navigator.drive.setSpeeds(0,0);
+//		this.myRobot.setPosition(new Position(this.navigator.getCurrentX(),
+//				this.navigator.getCurrentY()));
+//		this.navigator.goBackwards(8);
+//		this.myRobot.setPosition(new Position(this.navigator.getCurrentX(),
+//				this.navigator.getCurrentY()));
+//		this.myArm.captureObject();
+//		//poll the object and scan
+//		
+//		try {
+//			Thread.sleep(2000);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		return returnValue;
+//	}
+	public boolean inspectObject(Tile suspectedTile, int initialX,int initialY){
+		boolean returnValue=true;
 		float usDist = USpoller.getDistance();
-		this.navigator.drive.setSpeeds(50, 50);
-		double initialPositionX= this.navigator.getCurrentX();
-		double initialPositionY= this.navigator.getCurrentY();
-		while(usDist>0.05){
-			usDist = USpoller.getDistance();
-			double distanceTravelled= Math.sqrt(Math.pow(initialPositionX-this.navigator.getCurrentX(), 2)+Math.pow(initialPositionY-this.navigator.getCurrentX(), 2));
-			if(distanceTravelled>25) break;
-		}
-		this.navigator.drive.setSpeeds(0,0);
+		myArm.raiseArmTo(1,captureAngle[1]);
+		Sound.beep();
+		myArm.raiseArmTo(0,captureAngle[0]);
+		Sound.beep();
+		this.navigator.goForward((usDist*100)-5);
 		this.myRobot.setPosition(new Position(this.navigator.getCurrentX(),
 				this.navigator.getCurrentY()));
+		myArm.raiseArmTo(1, 130);
+		myArm.raiseArmTo(1,captureAngle[1]);
+		myArm.raiseArmTo(1, 130);
+		if(this.ColorPoller.getColor().isSampleYellow()){
+			myArm.raiseArm(0);
+		}
+		else{
+			myArm.raiseArmTo(1,captureAngle[1]);
+			myArm.raiseArm(0);
+			myArm.raiseArmTo(1,145);
+			returnValue=false;
+		}
+		this.navigator.goBackwards(8);
+		this.myRobot.setPosition(new Position(this.navigator.getCurrentX(),
+				this.navigator.getCurrentY()));
+//		this.myArm.captureObject();
 		//poll the object and scan
 		
 		try {
@@ -369,6 +441,7 @@ public class Game {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return returnValue;
 	}
 	public void turnToTile(Tile suspectedTile){
 		Task myPolicy= getIntersectionPolicy(suspectedTile);
@@ -406,7 +479,10 @@ public class Game {
 			return Task.MOVELEFT;
 		}
 	} 
-	public Task[] pathGenerator(Task[] currentPath, int startX,int startY,int endX,int endY,ArrayList<Tile> tilesToBeUnBlocked){
+	public Task[] pathGenerator(Task[] currentPath, int startX,int startY,int endX,int endY,ArrayList<Tile> tilesToBeUnBlocked, int restriction){
+		if(currentPath==null){
+			return currentPath;
+		}
 		Task theRepeatedTask= currentPath[0];
 		int counter =0;
 		int i= startX;
@@ -430,11 +506,34 @@ public class Game {
 				theRepeatedTask=myTask;
 				counter=1;
 			}
-			if(counter==3&&!(i==endX&&j==endY)){
+			if(counter==restriction&&!(i==endX&&j==endY)){
 				this.myField.getTile(j, i).setBlock(Block.BLOCKED);
 				tilesToBeUnBlocked.add(this.myField.getTile(j, i));
 				Task[] newPath= aStarAlgorithm.aStar(myField.getTiles(), startX,startY,endX,endY);
-				return  pathGenerator( newPath,  startX, startY,endX,endY,tilesToBeUnBlocked);
+				if(newPath==null){
+					for(Tile myTile: tilesToBeUnBlocked ){
+						myTile.setBlock(Block.UNBLOCKED);
+					}
+					newPath= aStarAlgorithm.aStar(myField.getTiles(), startX,startY,endX,endY);
+					return pathGenerator( newPath,  startX, startY,endX,endY,tilesToBeUnBlocked,restriction+1);
+				}
+				return  pathGenerator( newPath,  startX, startY,endX,endY,tilesToBeUnBlocked,restriction);
+//				boolean equal=true;
+//				if(newPath.length!=currentPath.length){
+//					return  pathGenerator( newPath,  startX, startY,endX,endY,tilesToBeUnBlocked);
+//
+//				}
+//				else {
+//					for(int k=0;k<newPath.length;k++){
+//						if(newPath[k]!=currentPath[k]){
+//							equal=false;
+//							break;}
+//					}
+//					if(equal) {return newPath;}
+//					else {
+//						return  pathGenerator( newPath,  startX, startY,endX,endY,tilesToBeUnBlocked);
+//					}
+//				}
 			}
 			
 		}
@@ -442,6 +541,23 @@ public class Game {
 			myTile.setBlock(Block.UNBLOCKED);
 		}
 		return currentPath;
+	}
+	public Tile chooseSuspectedTile(ArrayList<Tile> suspectedTileList){
+		int robotTileX = (int) (this.myRobot.getPosition().getPositionX() / this.myField
+				.getTileSize());
+		int robotTileY = (int) (this.myRobot.getPosition().getPositionY() / this.myField
+				.getTileSize());
+		double manDistance=aStarAlgorithm.manhattan(this.myField.getTiles(), robotTileX, robotTileY,  suspectedTileList.get(0).getTileIndexX(),  suspectedTileList.get(0).getTileIndexY());
+		double currentDiffDistance=manDistance;
+		Tile currentTile= this.myField.getTile(suspectedTileList.get(0).getTileIndexY(),  suspectedTileList.get(0).getTileIndexX());
+		for(int i=1;i<suspectedTileList.size();i++){
+			manDistance=aStarAlgorithm.manhattan(this.myField.getTiles(), robotTileX, robotTileY,  suspectedTileList.get(i).getTileIndexX(),  suspectedTileList.get(i).getTileIndexY());
+			if(manDistance<currentDiffDistance){
+				currentDiffDistance= manDistance;
+				currentTile= this.myField.getTile(suspectedTileList.get(i).getTileIndexY(),  suspectedTileList.get(i).getTileIndexX());
+			}
+		}
+		return currentTile;
 	}
 
 }

@@ -22,10 +22,10 @@ public class FilteredColorPoller extends Thread {
 	private static final Port[] colorPort = { LocalEV3.get().getPort("S2"), LocalEV3.get().getPort("S3"),LocalEV3.get().getPort("S4") };
 	private SampleProvider colorFilteredSource[] = new SampleProvider[numberOfSensors];
 	float[][] colorData = new float[numberOfSensors][];
-
+	private Color myColor;
 	// Adjustable Variables
 	private static final int[] colorReadingsToMedian = { 8, 5,5};
-	private String[] colorMode = { "ColorID", "Red","Red" };
+	private String[] colorMode = { "RGB", "Red","Red" };
 
 	/** 
 	 * Constructor
@@ -50,6 +50,7 @@ public class FilteredColorPoller extends Thread {
 			// initialize an array of floats for fetching samples
 			this.colorData[i] = new float[colorFilteredSource[i].sampleSize()];
 		}
+		myColor= new Color();
 		this.start();
 	}
 
@@ -112,6 +113,12 @@ public class FilteredColorPoller extends Thread {
 	 */
 	public float getReadingOf(int i) {
 		return this.colorData[i][0];
+	}
+	public Color getColor() {
+		myColor.setR(this.colorData[0][0]*1024);
+		myColor.setG(this.colorData[0][1]*1024);
+		myColor.setB(this.colorData[0][2]*1024);
+		return this.myColor;
 	}
 
 }

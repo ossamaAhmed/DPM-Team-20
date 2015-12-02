@@ -13,6 +13,8 @@ public class Field {
 	private double tileSize;
 	private int xTiles;
 	private int yTiles;
+	public int xHomeZone;
+	public int yHomeZone;
 	
 	/** 
 	 * Constructor

@@ -1,6 +1,7 @@
 package initializationRoutine;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import navigationController.*;
 import lejos.hardware.Button;
@@ -20,6 +21,7 @@ import FieldMap.Block;
 import FieldMap.Field;
 import FieldMap.Position;
 import FieldMap.Robot;
+import FieldMap.Tile;
 import FieldMap.Zone;
 import Game.Game;
 
@@ -74,9 +76,13 @@ public class Initializationn {
 		odoC.run = false;
 		//Assumes robot begins at center of 2nd diagonal tile
 		Field myField= new Field(12,12,30);
-		Game myGame= new Game(myRobot,myField, nav, usPoller,arm,odoC);
-		setOpponentZone( myField,t.opponentHomeZoneBL_X+1,t.opponentHomeZoneBL_Y+1,t.opponentHomeZoneTR_X,t.opponentHomeZoneTR_Y);
-		myGame.moveRobot(t.opponentHomeZoneBL_X, t.opponentHomeZoneBL_Y+1);
+		myField.xHomeZone= t.dropZone_X+1;
+		myField.yHomeZone= t.dropZone_Y+1;
+		Game myGame= new Game(myRobot,myField, nav, usPoller,arm,odoC,colorPoller);
+		ArrayList<Tile> mySuspectedTiles= setOpponentZone( myField,t.opponentHomeZoneBL_X+1,t.opponentHomeZoneBL_Y+1,t.opponentHomeZoneTR_X,t.opponentHomeZoneTR_Y);
+		setHomeZone( myField, t.homeZoneBL_X+1, t.homeZoneBL_Y+1, t.homeZoneTR_X,t.homeZoneTR_Y);
+//		myGame.moveRobot(t.opponentHomeZoneBL_X, t.opponentHomeZoneBL_Y+1);
+		myGame.searchZone(mySuspectedTiles);
 		
 		
 		
@@ -229,13 +235,30 @@ public class Initializationn {
 			break;
 		}
 	}
-	public static void setOpponentZone(Field myField, int BLX,int BLY,int TRX,int TRY){
+	public static ArrayList<Tile> setOpponentZone(Field myField, int BLX,int BLY,int TRX,int TRY){
+		ArrayList<Tile> suspectedTiles= new ArrayList<Tile>();
 		for(int j=BLY;j<TRY+1;j++){
 			for (int i=BLX;i<TRX+1;i++){
-				if(i>=BLX && i<=TRX && j>=BLY&& j<=TRY)
+				if(i>=BLX && i<=TRX && j>=BLY&& j<=TRY){
 				myField.getTile(j, i).setZoneType(Zone.OPPONENT_ZONE);
 				myField.getTile(j, i).setBlock(Block.BLOCKED);
+				suspectedTiles.add(myField.getTile(j, i));
+				}
 			}
 		}
+		return suspectedTiles;
+	}
+	public static ArrayList<Tile> setHomeZone(Field myField, int BLX,int BLY,int TRX,int TRY){
+		ArrayList<Tile> myHomeZoneTiles= new ArrayList<Tile>();
+		for(int j=BLY;j<TRY+1;j++){
+			for (int i=BLX;i<TRX+1;i++){
+				if(i>=BLX && i<=TRX && j>=BLY&& j<=TRY){
+				myField.getTile(j, i).setZoneType(Zone.OPPONENT_ZONE);
+				myField.getTile(j, i).setBlock(Block.BLOCKED);
+				myHomeZoneTiles.add(myField.getTile(j, i));
+				}
+			}
+		}
+		return myHomeZoneTiles;
 	}
 }

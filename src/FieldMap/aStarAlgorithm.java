@@ -212,7 +212,7 @@ public class aStarAlgorithm {
 	 * @param endPosY the destination's tile y index
 	 * @return Manhattan distance used in path finding algorithm.
 	 */
-	private static int manhattan(Tile[][] myMap, int cellPosX, int cellPosY, int endPosX, int endPosY) {
+	public static int manhattan(Tile[][] myMap, int cellPosX, int cellPosY, int endPosX, int endPosY) {
 		int dX = Math.abs(cellPosX- endPosX);
 		int dY = Math.abs(cellPosY- endPosY);
 		return (dY + dX);
