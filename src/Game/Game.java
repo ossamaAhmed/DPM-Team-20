@@ -155,7 +155,7 @@ public class Game {
 			e1.printStackTrace();
 		}
 		float usDist= USpoller.getDistance();
-		if(usDist<0.20){
+		if(usDist<0.28){
 			
 //			this.navigator.goForward(distanceUltraSonic);
 			this.myRobot.setPosition(new Position(this.navigator.getCurrentX(),this.navigator.getCurrentY()));
@@ -180,7 +180,7 @@ public class Game {
 			e.printStackTrace();
 		}
 		usDist= USpoller.getDistance();
-		if(usDist<0.25){
+		if(usDist<0.28){
 			this.navigator.goBackwards((this.myField.getTileSize()/2));
 			this.myRobot.setPosition(new Position(this.navigator.getCurrentX(),this.navigator.getCurrentY()));
 			return false;
@@ -419,68 +419,14 @@ public class Game {
 		this.navigator.goForward((usDist*100)-5);
 		this.myRobot.setPosition(new Position(this.navigator.getCurrentX(),
 				this.navigator.getCurrentY()));
-		myArm.raiseArmTo(1, 130);
+		myArm.raiseArmTo(1, 170);
 		myArm.raiseArmTo(1,captureAngle[1]);
-		myArm.raiseArmTo(1, 130);
-		switch(this.flagColor){
-		case 0: if(this.ColorPoller.getColor().isSampleBlue()){
-			myArm.raiseArm(0);
-		}
-		else{
-			myArm.raiseArmTo(1,captureAngle[1]);
-			myArm.raiseArm(0);
-			myArm.raiseArmTo(1,145);
-			returnValue=false;
-		}
-			break;
-			case 1:if(this.ColorPoller.getColor().isSampleYellow()){
-				myArm.raiseArm(0);
-			}
-			else{
-				myArm.raiseArmTo(1,captureAngle[1]);
-				myArm.raiseArm(0);
-				myArm.raiseArmTo(1,145);
-				returnValue=false;
-			}
-			break;
-		case 2:if(this.ColorPoller.getColor().isSampleWhite()){
-			myArm.raiseArm(0);
-		}
-		else{
-			myArm.raiseArmTo(1,captureAngle[1]);
-			myArm.raiseArm(0);
-			myArm.raiseArmTo(1,145);
-			returnValue=false;
-		}
-			break;
-		case 3:if(this.ColorPoller.getColor().isSampleRed()){
-			myArm.raiseArm(0);
-		}
-		else{
-			myArm.raiseArmTo(1,captureAngle[1]);
-			myArm.raiseArm(0);
-			myArm.raiseArmTo(1,145);
-			returnValue=false;
-		}
-			break;
-		case 4:if(this.ColorPoller.getColor().isSampleLightBlue()){
-			myArm.raiseArm(0);
-		}
-		else{
-			myArm.raiseArmTo(1,captureAngle[1]);
-			myArm.raiseArm(0);
-			myArm.raiseArmTo(1,145);
-			returnValue=false;
-		}
-			break;
-		}
-		
+		myArm.raiseArmTo(1, 170);
+		// start add stuff
+		myArm.raiseArm(0);
 		this.navigator.goBackwards(8);
 		this.myRobot.setPosition(new Position(this.navigator.getCurrentX(),
-				this.navigator.getCurrentY()));
-//		this.myArm.captureObject();
-		//poll the object and scan
-		
+		this.navigator.getCurrentY()));
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
@@ -488,6 +434,73 @@ public class Game {
 			e.printStackTrace();
 		}
 		return returnValue;
+		// end add stuff
+//		switch(this.flagColor){
+//		case 5: if(this.ColorPoller.getColor().isSampleBlue()){
+//			myArm.raiseArm(0);
+//		}
+//		else{
+//			myArm.raiseArmTo(1,captureAngle[1]);
+//			myArm.raiseArm(0);
+//			myArm.raiseArmTo(1,145);
+//			returnValue=false;
+//		}
+//			break;
+//			case 3:if(this.ColorPoller.getColor().isSampleYellow()){
+//				myArm.raiseArm(0);
+//			}
+//			else{
+//				myArm.raiseArmTo(1,captureAngle[1]);
+//				myArm.raiseArm(0);
+//				myArm.raiseArmTo(1,145);
+//				returnValue=false;
+//			}
+//			break;
+//		case 4:if(this.ColorPoller.getColor().isSampleWhite()){
+//			myArm.raiseArm(0);
+//		}
+//		else{
+//			myArm.raiseArmTo(1,captureAngle[1]);
+//			myArm.raiseArm(0);
+//			myArm.raiseArmTo(1,145);
+//			returnValue=false;
+//		}
+//			break;
+//		case 2:if(this.ColorPoller.getColor().isSampleRed()){
+//			myArm.raiseArm(0);
+//		}
+//		else{
+//			myArm.raiseArmTo(1,captureAngle[1]);
+//			myArm.raiseArm(0);
+//			myArm.raiseArmTo(1,145);
+//			returnValue=false;
+//		}
+//			break;
+//		case 1:if(this.ColorPoller.getColor().isSampleLightBlue()){
+//			myArm.raiseArm(0);
+//		}
+//		else{
+//			myArm.raiseArmTo(1,captureAngle[1]);
+//			myArm.raiseArm(0);
+//			myArm.raiseArmTo(1,145);
+//			returnValue=false;
+//		}
+//			break;
+//		}
+//		
+//		this.navigator.goBackwards(8);
+//		this.myRobot.setPosition(new Position(this.navigator.getCurrentX(),
+//				this.navigator.getCurrentY()));
+////		this.myArm.captureObject();
+//		//poll the object and scan
+//		
+//		try {
+//			Thread.sleep(2000);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		return returnValue;
 	}
 	public void turnToTile(Tile suspectedTile){
 		Task myPolicy= getIntersectionPolicy(suspectedTile);

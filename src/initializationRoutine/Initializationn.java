@@ -28,8 +28,8 @@ import Game.Game;
 
 public class Initializationn {
 	
-//	private static final String SERVER_IP = "192.168.10.200";
-	private static final String SERVER_IP = "192.168.43.193";
+	private static final String SERVER_IP = "192.168.10.200";
+	//private static final String SERVER_IP = "192.168.10.42";
 	private static final int TEAM_NUMBER = 20;
 	private final static boolean useWifi = true;
 	private static WifiConnection conn = null;
@@ -49,6 +49,7 @@ public class Initializationn {
 		LightLocalizer lightLoc = new LightLocalizer(nav, odo, drive, colorPoller); 
 		
 
+		
 		// User Interface
 		(new Thread() {
 			@Override
@@ -64,7 +65,24 @@ public class Initializationn {
 		Sound.beep();
 		arm.raiseArm(0);
 		initWifi();
-		
+		//added stuff
+//		 final int armAngleL[] = {110,0}; // The required rotation to raise or lower the arm
+//		 final int captureAngle[] = {110,-110}; // The required rotation to raise or lower the arm
+//		arm.raiseArmTo(1,captureAngle[1]);
+//		Sound.beep();
+//		arm.raiseArmTo(0,captureAngle[0]);
+//		arm.raiseArmTo(1, 170);
+//		arm.raiseArmTo(1,captureAngle[1]);
+//		arm.raiseArmTo(1, 110);
+//		//switch
+//		arm.raiseArm(0);
+//		try {
+//			Thread.sleep(10000);
+//		} catch (InterruptedException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+		//end added stuff
 		USLocalizer myLoc= new USLocalizer(odo,usPoller,nav,drive,USLocalizer.LocalizationType.RISING_EDGE);
 		myLoc.doLocalization();
 		LightLocalizer myLightLoc= new LightLocalizer(nav, odo, drive, colorPoller);
@@ -83,110 +101,6 @@ public class Initializationn {
 		setHomeZone( myField, t.homeZoneBL_X+1, t.homeZoneBL_Y+1, t.homeZoneTR_X,t.homeZoneTR_Y);
 //		myGame.moveRobot(t.opponentHomeZoneBL_X, t.opponentHomeZoneBL_Y+1);
 		myGame.searchZone(mySuspectedTiles);
-		
-		
-		
-		// If no command line arguements, resume old init with buttons
-		
-		do {
-			buttonChoice = Button.waitForAnyPress();
-		}
-
-		while (buttonChoice != Button.ID_LEFT && buttonChoice != Button.ID_RIGHT && buttonChoice != Button.ID_UP && buttonChoice != Button.ID_DOWN);
-		{
-			
-		}
-		
-		// Left Button
-		if (buttonChoice == Button.ID_LEFT) {
-			drive.setFloat();
-			while (true){
-			System.out.println("Sensor 1: " + (int)(100*colorPoller.getReadingOf(1)));
-			System.out.println("Sensor 2: " + (int)(100*colorPoller.getReadingOf(2)));
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			}
-		}
-
-		// Right Button
-		else if (buttonChoice == Button.ID_RIGHT) {
-			
-			arm.raiseArm(0);
-//			USLocalizer myLoc= new USLocalizer(odo,usPoller,nav,drive,USLocalizer.LocalizationType.RISING_EDGE);
-//			myLoc.doLocalization();
-//			LightLocalizer myLightLoc= new LightLocalizer(nav, odo, drive, colorPoller);
-//			myLightLoc.doLocalization();
-//			try {
-//				Thread.sleep(1000);
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//			nav.travelTo(15, 17);
-//			nav.turnTo(0, true);
-//			double[] newpos={0,0,0};
-//			boolean[] newbol={true,true,true};
-//			odo.setPosition(newpos, newbol);
-//			try {
-//				Thread.sleep(1000);
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//			nav.travelTo((35/2.0), (35/2.0+4));
-//			nav.turnTo(0, true);
-//			double[] newpos2={45,45,0};
-//			boolean[] newbol2={true,true,true};
-//			odo.setPosition(newpos2, newbol2); 
-//			nav.travelTo(45, 45);
-//			nav.turnTo(0, true);
-//			odoC.run = false;
-//			//Assumes robot begins at center of 2nd diagonal tile
-//			Robot myRobot= new Robot(new Position((30/2.0)+30,(30/2.0)+30));
-//			Field myField= new Field(12,12,30);
-//			Game myGame= new Game(myRobot,myField, nav, usPoller,arm,odoC);
-//			myGame.moveRobot(5, 6);
-			
-
-
-
-		}
-
-		// Up Button
-		else if (buttonChoice == Button.ID_UP) {
-			LCDInfo lcd = new LCDInfo(odo, usPoller, colorPoller);
-			drive.setFloat();
-			odoC.run=true;
-			// Press enter to set both arms to zero, press up to set both arms to armAngle
-			while (buttonChoice != Button.ID_ENTER) {
-
-			}
-			// Raise both arm 0 and 1 to 0 degrees
-//			arm.raiseArm(0);
-//			arm.raiseArm(1);
-//			while (buttonChoice != Button.ID_UP) {
-//
-//			}
-//			// Drop both arm 0 and 1 to armAngle
-//			arm.dropArm(0);
-//			arm.dropArm(1);
-		}
-
-		// Down Button
-		else if (buttonChoice == Button.ID_DOWN) {
-			arm.raiseArm(0);
-			odoC.run = true;
-			for (int i =0;i<10;i++){
-			nav.travelTo(60, 0);
-			nav.travelTo(60, 60);
-			nav.travelTo(0, 60);
-			nav.travelTo(0, 0);
-			}
-		}
 		}
 
 
