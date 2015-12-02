@@ -37,8 +37,8 @@ public class ArmController {
 	 * @param index The arm that will be raised
 	 */
 	public void raiseArm(int index){
-		armMotor[index].setAcceleration(500);
-		armMotor[index].rotateTo(0);
+		armMotor[index].setAcceleration(1000);
+		armMotor[index].rotateTo(-100);
 	}
 	
 	/**
@@ -47,7 +47,7 @@ public class ArmController {
 	 * @param index The arm that will be lowered
 	 */
 	public void dropArm(int index){
-		armMotor[index].setAcceleration(25);
+		armMotor[index].setAcceleration(250);
 		armMotor[index].rotateTo(armAngleL[index]);
 		
 	}
@@ -58,8 +58,8 @@ public class ArmController {
 	 * @param angle The angle to raise or lower the arm to
 	 */
 	public void raiseArmTo(int index, int angle){
-		armMotor[index].setAcceleration(25);
-		armMotor[index].rotate(angle);
+		armMotor[index].setAcceleration(250);
+		armMotor[index].rotateTo(angle);
 	}
 	
 	public void captureObject(){

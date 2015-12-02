@@ -78,7 +78,7 @@ public class Initializationn {
 		Field myField= new Field(12,12,30);
 		myField.xHomeZone= t.dropZone_X+1;
 		myField.yHomeZone= t.dropZone_Y+1;
-		Game myGame= new Game(myRobot,myField, nav, usPoller,arm,odoC,colorPoller);
+		Game myGame= new Game(myRobot,myField, nav, usPoller,arm,odoC,colorPoller, t.flagType);
 		ArrayList<Tile> mySuspectedTiles= setOpponentZone( myField,t.opponentHomeZoneBL_X+1,t.opponentHomeZoneBL_Y+1,t.opponentHomeZoneTR_X,t.opponentHomeZoneTR_Y);
 		setHomeZone( myField, t.homeZoneBL_X+1, t.homeZoneBL_Y+1, t.homeZoneTR_X,t.homeZoneTR_Y);
 //		myGame.moveRobot(t.opponentHomeZoneBL_X, t.opponentHomeZoneBL_Y+1);

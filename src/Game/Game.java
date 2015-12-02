@@ -26,6 +26,7 @@ public class Game {
 
 	private final double distanceUltraSonic= 9;
 	private ArmController myArm;
+	private int flagColor;
 	private  OdometerCorrection odoC;
 	private static final int armAngleL[] = {110,0}; // The required rotation to raise or lower the arm
 	private static final int captureAngle[] = {110,-110}; // The required rotation to raise or lower the arm
@@ -37,13 +38,14 @@ public class Game {
 	 * @param USpoller is the ultrasonic sensor that will be used in detecting the obstacles 
 	 * and blocking the tiles
 	 */
-	public Game(Robot myRobot,Field myField, Navigator navigator, FilteredUltrasonicPoller USpoller, ArmController arm, OdometerCorrection odoC,FilteredColorPoller colorPoller){
+	public Game(Robot myRobot,Field myField, Navigator navigator, FilteredUltrasonicPoller USpoller, ArmController arm, OdometerCorrection odoC,FilteredColorPoller colorPoller, int flagColor){
 		this.myField= myField;
 		this.myRobot= myRobot;
 		this.navigator=navigator; 
 		this.USpoller= USpoller;
 		this.myArm=arm;
 		this.odoC= odoC;
+		this.flagColor=flagColor;
 		this.ColorPoller=colorPoller;
 		this.odoC.run=false;
 	}
@@ -420,7 +422,8 @@ public class Game {
 		myArm.raiseArmTo(1, 130);
 		myArm.raiseArmTo(1,captureAngle[1]);
 		myArm.raiseArmTo(1, 130);
-		if(this.ColorPoller.getColor().isSampleYellow()){
+		switch(this.flagColor){
+		case 0: if(this.ColorPoller.getColor().isSampleBlue()){
 			myArm.raiseArm(0);
 		}
 		else{
@@ -429,6 +432,49 @@ public class Game {
 			myArm.raiseArmTo(1,145);
 			returnValue=false;
 		}
+			break;
+			case 1:if(this.ColorPoller.getColor().isSampleYellow()){
+				myArm.raiseArm(0);
+			}
+			else{
+				myArm.raiseArmTo(1,captureAngle[1]);
+				myArm.raiseArm(0);
+				myArm.raiseArmTo(1,145);
+				returnValue=false;
+			}
+			break;
+		case 2:if(this.ColorPoller.getColor().isSampleWhite()){
+			myArm.raiseArm(0);
+		}
+		else{
+			myArm.raiseArmTo(1,captureAngle[1]);
+			myArm.raiseArm(0);
+			myArm.raiseArmTo(1,145);
+			returnValue=false;
+		}
+			break;
+		case 3:if(this.ColorPoller.getColor().isSampleRed()){
+			myArm.raiseArm(0);
+		}
+		else{
+			myArm.raiseArmTo(1,captureAngle[1]);
+			myArm.raiseArm(0);
+			myArm.raiseArmTo(1,145);
+			returnValue=false;
+		}
+			break;
+		case 4:if(this.ColorPoller.getColor().isSampleLightBlue()){
+			myArm.raiseArm(0);
+		}
+		else{
+			myArm.raiseArmTo(1,captureAngle[1]);
+			myArm.raiseArm(0);
+			myArm.raiseArmTo(1,145);
+			returnValue=false;
+		}
+			break;
+		}
+		
 		this.navigator.goBackwards(8);
 		this.myRobot.setPosition(new Position(this.navigator.getCurrentX(),
 				this.navigator.getCurrentY()));
@@ -559,5 +605,7 @@ public class Game {
 		}
 		return currentTile;
 	}
+	
+
 
 }
