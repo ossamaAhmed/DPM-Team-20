@@ -52,6 +52,8 @@ public class Game {
 		int robotTileY= (int) ((int) this.myRobot.getPosition().getPositionY()/this.myField.getTileSize());
 
 		Task[]path= aStarAlgorithm.aStar(myField.getTiles(), robotTileX,robotTileY, tileX,tileY);
+		ArrayList<Tile> tilesToBeUnBlocked= new ArrayList<Tile>();
+		path = pathGenerator(path, robotTileX,robotTileY, tileX,tileY,tilesToBeUnBlocked);
 		for(int i=0;i< path.length;i++){
 			//update the robot's position
 			try {
@@ -73,6 +75,7 @@ public class Game {
 				robotTileX= (int) (this.myRobot.getPosition().getPositionX()/this.myField.getTileSize());
 				robotTileY= (int) (this.myRobot.getPosition().getPositionY()/this.myField.getTileSize());
 				path= aStarAlgorithm.aStar(myField.getTiles(), robotTileX,robotTileY, tileX,tileY);
+				path = pathGenerator(path, robotTileX,robotTileY, tileX,tileY,tilesToBeUnBlocked);
 				i=-1;
 			}
 		}
@@ -403,6 +406,42 @@ public class Game {
 			return Task.MOVELEFT;
 		}
 	} 
-	
+	public Task[] pathGenerator(Task[] currentPath, int startX,int startY,int endX,int endY,ArrayList<Tile> tilesToBeUnBlocked){
+		Task theRepeatedTask= currentPath[0];
+		int counter =0;
+		int i= startX;
+		int j= startY;
+		for(Task myTask: currentPath){
+			switch(myTask){
+			case MOVELEFT: i--;
+							break;
+			case MOVERIGHT: i++;
+							break;
+			case MOVEUP:	j++;
+							break;
+			case MOVEDOWN:	j--;
+							break;
+
+			}
+			if(theRepeatedTask==myTask){
+				counter++;
+			}
+			else{
+				theRepeatedTask=myTask;
+				counter=1;
+			}
+			if(counter==3&&!(i==endX&&j==endY)){
+				this.myField.getTile(j, i).setBlock(Block.BLOCKED);
+				tilesToBeUnBlocked.add(this.myField.getTile(j, i));
+				Task[] newPath= aStarAlgorithm.aStar(myField.getTiles(), startX,startY,endX,endY);
+				return  pathGenerator( newPath,  startX, startY,endX,endY,tilesToBeUnBlocked);
+			}
+			
+		}
+		for(Tile myTile: tilesToBeUnBlocked ){
+			myTile.setBlock(Block.UNBLOCKED);
+		}
+		return currentPath;
+	}
 
 }
