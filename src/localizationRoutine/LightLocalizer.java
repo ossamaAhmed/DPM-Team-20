@@ -13,7 +13,7 @@ public class LightLocalizer {
 	private DriveController drive;
 	private FilteredColorPoller colorPoller;
 	// Variables
-	private static final float lineIntensity = 0.70f;
+	private static final float lineIntensity = 0.56f;
 	private static final double sensorDistance = 9;
 	private static final int abortAngle = 30;
 
@@ -25,20 +25,18 @@ public class LightLocalizer {
 	}
 
 	public void doLocalization() {
-		drive.setSpeeds(drive.SLOW, drive.SLOW);
-		while (!lineDetected(1) || !lineDetected(2)) {
+		drive.setSpeeds(drive.MEDIUM, drive.MEDIUM);
+		while (!lineDetected(1) && !lineDetected(2)) {
 
 		}
-		doAllignRobot();
 		odo.setAng(0);
 		drive.setSpeeds(0, 0);
 		nav.goBackwards(sensorDistance+1);
 		nav.turnUp();
-		drive.setSpeeds(drive.SLOW, drive.SLOW);
-		while (!lineDetected(1) || !lineDetected(2)) {
+		drive.setSpeeds(drive.MEDIUM, drive.MEDIUM);
+		while (!lineDetected(1) && !lineDetected(2)) {
 
 		}
-		doAllignRobot();
 		odo.setAng(90);
 		nav.goBackwards(sensorDistance+1);
 		drive.setSpeeds(0, 0);

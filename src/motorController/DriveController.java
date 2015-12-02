@@ -10,7 +10,7 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
  */
 public class DriveController {
 	public final int SLOW = 75;
-	public final static int MEDIUM = 150;
+	public final static int MEDIUM = 100;
 	public final static int FAST = 225;
 	private final EV3LargeRegulatedMotor[] drivingMotor = { new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A")), new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D")) };
 

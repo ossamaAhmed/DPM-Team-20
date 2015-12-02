@@ -21,11 +21,11 @@ import motorController.DriveController;
  *
  */
 public class Navigator{
-	final int FAST = 150;
+	final int FAST = 250;
 	final int SLOW = 100;
 	final long delayAmount = 100;
 	static final int ACCELERATION = 1500;
-	final static double DEG_ERR = 3.0, CM_ERR = 1.0;
+	final static double DEG_ERR = 3.0, CM_ERR = 3.0;
 	private Odometer odo;
 	public volatile boolean correctionFlag = false;
 	public DriveController drive;

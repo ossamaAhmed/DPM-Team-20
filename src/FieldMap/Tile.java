@@ -1,3 +1,4 @@
+
 /*
  * File: Tile.java
  * Written by: Ossama Ahmed
@@ -23,6 +24,7 @@ public class Tile {
 	private int yIndex;
 	private boolean isDiscovered;
 	private Block block;
+	private Zone myZone;
 	
 	//variables used for the aStar Algorithm
 	private int fScore;
@@ -43,6 +45,7 @@ public class Tile {
 		this.yIndex=tileNumberY;
 		this.isDiscovered=false;
 		this.tileSize=tileSize;
+		this.myZone= Zone.NOT_ZONE;
 		this.block=block;
 		this.topLeftPosition= new Position((tileSize*tileNumberX),((tileNumberY+1)*tileSize)); //tileNumberX starts with zero
 		this.topRightPosition=new Position((tileSize*(tileNumberX+1)),((tileNumberY+1)*tileSize));
@@ -165,6 +168,12 @@ public class Tile {
 	 */
 	public double getTileSize(){
 		return this.tileSize;
+	}
+	public Zone getZoneType(){
+		return this.myZone;
+	}
+	public void setZoneType(Zone myZone){
+		this.myZone=myZone;
 	}
 	/*Methods used in the astar algorithm*/
 	

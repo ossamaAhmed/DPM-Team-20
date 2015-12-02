@@ -29,7 +29,7 @@ public class WifiTest {
 	// 2. TEAM_NUMBER: your project team number
 	
 	private static final String SERVER_IP = "localhost";
-	private static final int TEAM_NUMBER = 16;
+	private static final int TEAM_NUMBER = 20;
 	
 	
 	private static TextLCD LCD = LocalEV3.get().getTextLCD();

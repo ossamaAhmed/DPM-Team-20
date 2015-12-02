@@ -16,18 +16,20 @@ import sensorController.FilteredUltrasonicPoller;
 import wifi.StartCorner;
 import wifi.Transmission;
 import wifi.WifiConnection;
+import FieldMap.Block;
 import FieldMap.Field;
 import FieldMap.Position;
 import FieldMap.Robot;
+import FieldMap.Zone;
 import Game.Game;
 
 
 public class Initializationn {
 	
 //	private static final String SERVER_IP = "192.168.10.200";
-	private static final String SERVER_IP = "192.168.43.83";
+	private static final String SERVER_IP = "192.168.43.193";
 	private static final int TEAM_NUMBER = 20;
-	private final static boolean useWifi = false;
+	private final static boolean useWifi = true;
 	private static WifiConnection conn = null;
 	private static Transmission t = null;
 
@@ -61,56 +63,25 @@ public class Initializationn {
 		arm.raiseArm(0);
 		initWifi();
 		
-		// New Command Line Initialization from console
-		// Performs all given commands in order
-		if (args.length != 0) {
-			  for (String s: args) {
-				  switch (s){
-					case "squareDrive":{
-						arm.raiseArm(0);
-						nav.travelTo(70, 0);
-						nav.travelTo(70, 70);
-						nav.travelTo(0,70);
-						nav.travelTo(0,0);
-						
-					}
-					case "localize": {
-						arm.raiseArm(0);
-						USLocalizer myLoc= new USLocalizer(odo, usPoller, nav, drive, USLocalizer.LocalizationType.RISING_EDGE);
-						myLoc.doLocalization();
-						odo.setAng(odo.getAng()+90*((t.startingCorner.getId())-1));
-					}
-					
-					case "navToZone": {
-						//Assumes robot begins at center of 2nd diagonal tile
-						double[] newpos2= {(35/2.0)+35,(35/2.0)+35,0};
-						boolean[] newbol2= {true,true,true};
-						odo.setPosition(newpos2, newbol2);
-						Robot myRobot= new Robot(new Position((35/2.0)+35,(35/2.0)+35));
-						Field myField= new Field(8,8,35);
-						Game myGame= new Game(myRobot,myField, nav, usPoller);
-						myGame.moveRobot(t.opponentHomeZoneBL_X, t.opponentHomeZoneBL_Y);
-						
-					}
-					
-					case "travelTo": {
-						arm.raiseArm(0);
-						double x = 17.5;
-						double y = 17.5;
-						nav.travelTo(x, y);
-					}
-					
-					case "odoC": {
-						odoC.run=true;
-					}
-					
-				}
-		        }
-		}
+		USLocalizer myLoc= new USLocalizer(odo,usPoller,nav,drive,USLocalizer.LocalizationType.RISING_EDGE);
+		myLoc.doLocalization();
+		LightLocalizer myLightLoc= new LightLocalizer(nav, odo, drive, colorPoller);
+		myLightLoc.doLocalization();
+		nav.travelTo(45, 45);
+		Robot myRobot= new Robot(new Position((30/2.0)+30,(30/2.0)+30));
+		nav.turnTo(0, true);
+		setStartingPositionOfRobot( myRobot, t.startingCorner.getId(), odo);
+		odoC.run = false;
+		//Assumes robot begins at center of 2nd diagonal tile
+		Field myField= new Field(12,12,30);
+		Game myGame= new Game(myRobot,myField, nav, usPoller,arm,odoC);
+		setOpponentZone( myField,t.opponentHomeZoneBL_X+1,t.opponentHomeZoneBL_Y+1,t.opponentHomeZoneTR_X,t.opponentHomeZoneTR_Y);
+		myGame.moveRobot(t.opponentHomeZoneBL_X, t.opponentHomeZoneBL_Y+1);
+		
 		
 		
 		// If no command line arguements, resume old init with buttons
-		else {
+		
 		do {
 			buttonChoice = Button.waitForAnyPress();
 		}
@@ -137,9 +108,45 @@ public class Initializationn {
 
 		// Right Button
 		else if (buttonChoice == Button.ID_RIGHT) {
-			usLoc.doLocalization();
-			lightLoc.doLocalization();
 			
+			arm.raiseArm(0);
+//			USLocalizer myLoc= new USLocalizer(odo,usPoller,nav,drive,USLocalizer.LocalizationType.RISING_EDGE);
+//			myLoc.doLocalization();
+//			LightLocalizer myLightLoc= new LightLocalizer(nav, odo, drive, colorPoller);
+//			myLightLoc.doLocalization();
+//			try {
+//				Thread.sleep(1000);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			nav.travelTo(15, 17);
+//			nav.turnTo(0, true);
+//			double[] newpos={0,0,0};
+//			boolean[] newbol={true,true,true};
+//			odo.setPosition(newpos, newbol);
+//			try {
+//				Thread.sleep(1000);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			nav.travelTo((35/2.0), (35/2.0+4));
+//			nav.turnTo(0, true);
+//			double[] newpos2={45,45,0};
+//			boolean[] newbol2={true,true,true};
+//			odo.setPosition(newpos2, newbol2); 
+//			nav.travelTo(45, 45);
+//			nav.turnTo(0, true);
+//			odoC.run = false;
+//			//Assumes robot begins at center of 2nd diagonal tile
+//			Robot myRobot= new Robot(new Position((30/2.0)+30,(30/2.0)+30));
+//			Field myField= new Field(12,12,30);
+//			Game myGame= new Game(myRobot,myField, nav, usPoller,arm,odoC);
+//			myGame.moveRobot(5, 6);
+			
+
+
 
 		}
 
@@ -177,7 +184,7 @@ public class Initializationn {
 		}
 
 
-	}
+	
 	
 	public static void initWifi()	{
 		if (useWifi){
@@ -196,5 +203,39 @@ public class Initializationn {
 			} 
 			}
 		
+	}
+	public static void setStartingPositionOfRobot(Robot myRobot, int id, Odometer myOdo){
+		switch(id){
+		case 1: myRobot.setPosition(new Position(45,45));
+				double[] newpos1={45,45,0};
+				boolean[] newbol1={true,true,true};
+				myOdo.setPosition(newpos1, newbol1);
+			break;
+		case 2: myRobot.setPosition(new Position(315,45));
+				double[] newpos2={315,45,90};
+				boolean[] newbol2={true,true,true};
+				myOdo.setPosition(newpos2, newbol2);
+			break;
+		case 3: myRobot.setPosition(new Position(315,315));
+				double[] newpos3={315,315,180};
+				boolean[] newbol3={true,true,true};
+				myOdo.setPosition(newpos3, newbol3);
+			break;
+		case 4:
+			myRobot.setPosition(new Position(45,315));
+			double[] newpos4={45,315,270};
+			boolean[] newbol4={true,true,true};
+			myOdo.setPosition(newpos4, newbol4);
+			break;
+		}
+	}
+	public static void setOpponentZone(Field myField, int BLX,int BLY,int TRX,int TRY){
+		for(int j=BLY;j<TRY+1;j++){
+			for (int i=BLX;i<TRX+1;i++){
+				if(i>=BLX && i<=TRX && j>=BLY&& j<=TRY)
+				myField.getTile(j, i).setZoneType(Zone.OPPONENT_ZONE);
+				myField.getTile(j, i).setBlock(Block.BLOCKED);
+			}
+		}
 	}
 }

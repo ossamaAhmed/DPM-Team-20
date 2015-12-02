@@ -11,12 +11,13 @@ public class OdometerCorrection {
 	public volatile boolean run = false;
 	//Variables
 	private final static double distanceOfSensor = 9; // Distance of sensor from center of robot wheels
-	private final float lineIntensity = 0.7f;
+	private final float lineIntensity = 0.5f; //0.6
 	private final double correctionDistanceThreshold = 10;
-	private final int abortAngle = 45;
+	private final int abortAngle = 25; //45
 	//
 	private double[] lastCorrectionCoordinate = { 900, 900 }; // Last place odometry correction occured 
 	private double[] latchedPos = new double[3];
+	boolean[] sensorIsOnLine = new boolean[3];
 
 	public OdometerCorrection(Odometer odo, FilteredColorPoller colorPoller, DriveController drive) {
 		this.odo = odo;
@@ -26,11 +27,10 @@ public class OdometerCorrection {
 
 	public boolean doCorrectionRoutine() {
 		if (!run) return false;
-		if ((lineDetected(1) || lineDetected(2)) && shouldCorrect()) {
+		sensorIsOnLine[1] = lineDetected(1);
+		sensorIsOnLine[2] = lineDetected(2);
+		if ((sensorIsOnLine[1] || sensorIsOnLine[2]) && shouldCorrect()) {
 			System.out.println("1. Starting allign robot at " + (int) odo.getX() + " , " + (int) odo.getY() + " , " + (int) odo.getAng());
-			latchedPos[0]=odo.getX();
-			latchedPos[1]= odo.getY();
-			latchedPos[2]= odo.getAng();
 			if (!doAllignRobot()){
 				lastCorrectionCoordinate[0] = odo.getX();
 				lastCorrectionCoordinate[1] = odo.getY();
@@ -55,6 +55,9 @@ public class OdometerCorrection {
 
 	public void doOdoCorrection() {
 		// This is what the odometer is reading when the line is crossed
+		latchedPos[0]=odo.getX();
+		latchedPos[1]= odo.getY();
+		latchedPos[2]= odo.getAng();
 		double currentX = latchedPos[0];
 		double currentY = latchedPos[1];
 		// This is the robots new x and y;
@@ -98,16 +101,21 @@ public class OdometerCorrection {
 
 	public boolean doAllignRobot() {
 		double initAngle = odo.getAng();
-		boolean[] sensorIsOnLine = new boolean[3];
+		boolean[] sensorFlag = {false,false,false};
+		if (sensorIsOnLine[1]) sensorFlag[1] = true;
+		if (sensorIsOnLine[2]) sensorFlag[2] = true;
 		sensorIsOnLine[1] = lineDetected(1);
 		sensorIsOnLine[2] = lineDetected(2);
-		while (!sensorIsOnLine[1] || !sensorIsOnLine[2]) {
-			if (sensorIsOnLine[1])
+		
+		while (!sensorFlag[1] || !sensorFlag[2]) {
+			if (sensorFlag[1])
 				drive.setSpeeds(0, drive.SLOW);
-			else if (sensorIsOnLine[2])
+			else if (sensorFlag[2])
 				drive.setSpeeds(drive.SLOW, 0);
 			sensorIsOnLine[1] = lineDetected(1);
 			sensorIsOnLine[2] = lineDetected(2);
+			if (sensorIsOnLine[1]) sensorFlag[1] = true;
+			if (sensorIsOnLine[2]) sensorFlag[2] = true;
 			if (Math.abs(odo.minimumAngleFromTo(odo.getAng(),initAngle)) > abortAngle){
 				System.out.println("Aborting allignRobot");
 				return false;
@@ -116,6 +124,7 @@ public class OdometerCorrection {
 			}
 
 		}
+		delay(200);
 		drive.setSpeeds(0, 0);
 		delay(250);
 		return true;
