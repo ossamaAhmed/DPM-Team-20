@@ -1,13 +1,7 @@
 package navigationController;
 
-/*
- * File: Navigation.java
- */
-import FieldMap.Field;
-import FieldMap.Robot;
-import FieldMap.Tile;
+
 import sensorController.FilteredColorPoller;
-import sensorController.FilteredUltrasonicPoller;
 import navigationController.Odometer;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import motorController.DriveController;
@@ -17,41 +11,34 @@ import motorController.DriveController;
  * controls navigation and general robot movement
  *
  */
-public class Navigator extends Thread {
-	final static int FAST = 100;
-	final static int SLOW = 100;
-	final static int VERY_SLOW = 50;
-	final long delayAmount = 200;
+
+public class Navigator{
+	final int FAST = 250;
+	final int SLOW = 100;
+	final long delayAmount = 100;
 	static final int ACCELERATION = 1500;
-	final static double DEG_ERR = 2.0, CM_ERR = 3.0;
+	final static double DEG_ERR = 3.0, CM_ERR = 3.0;
 	private Odometer odo;
-	private EV3LargeRegulatedMotor leftMotor, rightMotor;
-	private DriveController drive;
-	private FilteredColorPoller colorPoller;
-	private FilteredUltrasonicPoller usPoller;
+	public volatile boolean correctionFlag = false;
+	public DriveController drive;
+	public FilteredColorPoller colorPoller;
+	private OdometerCorrection odoC;
 
 	/**
 	 * The constructor takes a Odometer and DriveController
 	 * 
 	 * @param odo Used to retrieve current x,y,theta position for navigation
 	 */
-	public Navigator(Odometer odo, DriveController drive, FilteredUltrasonicPoller usPoller, FilteredColorPoller colorPoller) {
+
+	public Navigator(Odometer odo, OdometerCorrection odoC, DriveController drive, FilteredColorPoller colorPoller) {
 		this.odo = odo;
 		this.drive = drive;
-		EV3LargeRegulatedMotor[] motors = this.drive.getMotors();
-		this.leftMotor = motors[0];
-		this.rightMotor = motors[1];
-		this.usPoller = usPoller;
 		this.colorPoller = colorPoller;
-		// set acceleration
+		this.odoC = odoC;
 		this.drive.setAcceleration(ACCELERATION);
-		this.start();
 	}
 
-	/*
-	 * TravelTo function which takes as arguments the x and y position in cm Will travel to designated position, while
-	 * constantly updating it's heading
-	 */
+
 	/**
 	 * This method turns towards a (x,y) coordinate and then travels in a straight
 	 * line until the destination
@@ -62,24 +49,23 @@ public class Navigator extends Thread {
 		drive.setSpeeds(0, 0);
 		delay(delayAmount);
 
-		double minAng;
-		minAng = (Math.atan2(y - odo.getY(), x - odo.getX())) * (180.0 / Math.PI);
-		if (minAng < 0)
-			minAng += 360.0;
+		double distance = getDistanceFromRobot(x, y);
+		adjustHeading(x, y, false,false);
 
-		this.turnTo(minAng, true);
-		drive.setSpeeds(FAST, FAST);
-
-		double dx = x - odo.getX();
-		double dy = y - odo.getY();
-		double distance = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
 		while (distance > CM_ERR) {
+			if (odoC.doCorrectionRoutine()) {
+				// Check if correction needs to be done, if so perform it. Otherwise
+				// go do the normal travelTo stuff.
+				distance = getDistanceFromRobot(x, y);
+			}
 
-			dx = x - odo.getX();
-			dy = y - odo.getY();
-			distance = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+			else {
+				adjustHeading(x, y, true,false);
+				drive.setSpeeds(FAST, FAST);
+				distance = getDistanceFromRobot(x, y);
+
+			}
 		}
-
 		drive.setSpeeds(0, 0);
 		delay(delayAmount);
 	}
@@ -94,67 +80,20 @@ public class Navigator extends Thread {
 		drive.setSpeeds(0, 0);
 		delay(delayAmount);
 
-		double minAng;
-		minAng = (Math.atan2(y - odo.getY(), x - odo.getX())) * (180.0 / Math.PI);
-		if (minAng < 0)
-			minAng += 360.0;
-		minAng += 180;
+		double distance = getDistanceFromRobot(x, y);
+		adjustHeading(x, y, false,true);
 
-		this.turnTo(minAng, true);
-		drive.setSpeeds(-1 * FAST, -1 * FAST);
-
-		double dx = x - odo.getX();
-		double dy = y - odo.getY();
-		double distance = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
 		while (distance > CM_ERR) {
-			dx = x - odo.getX();
-			dy = y - odo.getY();
-			distance = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
-		}
+		
+				adjustHeading(x, y, true,true);
+				drive.setSpeeds(-1*FAST, -1*FAST);
+				distance = getDistanceFromRobot(x, y);
 
-		drive.setSpeeds(0, 0);
-		delay(delayAmount);
-	}
-	
-	/**
-	 * This method makes the robot travels in a straight line backwards depending on the distance to a given tile.
-	 * @param robotTileY The Y coordinate of the tile
-	 * @param robotTileX The X coordinate of the tile
-	 * @param myField The field to which the tile belongs
-	 */
-	public void travelBackToTile(int robotTileY, int robotTileX, Field myField){
-		double[] myInitialPosition= {myField.getTile(robotTileY, robotTileX).getPosition().getPositionX(),
-				myField.getTile(robotTileY, robotTileX).getPosition().getPositionY()};
-		double[] myCurrentPosition= {getCurrentX(),
-				getCurrentY()};
-		double distanceToTravel= getCoordinateDistance(myCurrentPosition, myInitialPosition);
-		goBackwards(distanceToTravel);
-	}
-	
-	/**
-	 * This method makes the robot travel forward until the ultrasonic sensor detects and object.
-	 * @param detectionDistance The detection threshold distance
-	 * @param timeOutDistance The distance to timeout after travelling
-	 */
-	public void goForwardUntilObject(float detectionDistance, double timeOutDistance){
-		drive.setSpeeds(0, 0);
-		delay(delayAmount);
-		
-		double startX = odo.getX();
-		double startY = odo.getY();
-		drive.setSpeeds(VERY_SLOW, VERY_SLOW);
-		double travelledDistance = getDistanceFromRobot(startX,startY);
-		while (usPoller.getDistance() >= detectionDistance){
-			travelledDistance = getDistanceFromRobot(startX,startY);
-			if (travelledDistance > timeOutDistance) break;
-			//^ Wait inside this loop until an object is detected, or timeout
 		}
-		
 		drive.setSpeeds(0, 0);
 		delay(delayAmount);
-		
 	}
-	
+
 
 
 	/**
@@ -187,34 +126,6 @@ public class Navigator extends Thread {
 		}
 
 	}
-	
-	/**
-	 * Turns the robot towards a given tile
-	 * @param suspectedTile The tile to turn to
-	 * @param myRobot The robot to turn and position to update
-	 * @param myField The field to which the tile belongs
-	 */
-	public void turnToTile(Tile suspectedTile, Robot myRobot, Field myField){
-		int robotTileX = (int) (myRobot.getPosition().getPositionX() / myField
-				.getTileSize());
-		int robotTileY = (int) (myRobot.getPosition().getPositionY() / myField
-				.getTileSize());
-		int differenceX= robotTileX-suspectedTile.getTileIndexX();
-		int differenceY= robotTileY-suspectedTile.getTileIndexY();
-		if(differenceY==-1){
-			turnUp();
-		}
-		else if(differenceY==1){
-			turnDown();
-		}
-		else if(differenceX==-1){
-			turnRight();
-		}
-		else if(differenceX==1){
-			turnLeft();
-		}
-	}
-	
 
 	/**
 	 * This method moves the robot forward a given distance in cm
@@ -230,11 +141,13 @@ public class Navigator extends Thread {
 		}
 
 	}
+	
 
 	/**
 	 * This method moves the robot backwards a given distance in cm
 	 * @param distance The desired distance to move forward in cm
 	 */
+
 	public void goBackwards(double distance) {
 		if (distance >= 0) {
 			this.travelToBackwards(odo.getX() - Math.cos(Math.toRadians(this.odo.getAng())) * distance, odo.getY() - Math.sin(Math.toRadians(this.odo.getAng())) * distance);
@@ -335,7 +248,52 @@ public class Navigator extends Thread {
 			e.printStackTrace();
 		}
 	}
+
 	
+	/**
+	 * This method turns the robot to face a given x, y position.
+	 * @param x The given X coordinate
+	 * @param y The given Y coordinate
+	 * @param checkDegError If true, don't rotate for angles under the DEG_ERROR
+	 * @param backwards If true, face the robot's back to the given x,y position
+	 */
+	public void adjustHeading(double x, double y, boolean checkDegError, boolean backwards) {
+		double minAng;
+		minAng = (Math.atan2(y - odo.getY(), x - odo.getX())) * (180.0 / Math.PI);
+		if (minAng < 0)
+			minAng += 360.0;
+
+		if (backwards) minAng += 180;
+		// If checkDegError = true, only turn if minAng > DEG_ERR
+		if (checkDegError) {
+			if (getAngleDistance(minAng, odo.getAng()) > DEG_ERR)
+				this.turnTo(minAng, true);
+		} else if (!checkDegError) {
+			this.turnTo(minAng, true);
+		}
+
+	}
+
+	/**
+	 * Helper method which returns the shortest distance between angles a and b in degrees
+	 * @param a The first angle
+	 * @param b The second angle
+	 * @return The shortest distance between angle a and b (-180 to 180 degrees)
+	 */
+	public double getAngleDistance(double a, double b) {
+		// Given a and b, find the minimum distance between a and b (in degrees)
+		// while accounting for angle wrapping
+		double result = 0;
+		// Find the difference
+		result = Math.abs(a - b);
+		// Account for wrapping
+		if (result > 180) {
+			result = -1 * (result - 360);
+		}
+
+		return result;
+	}
+
 	/**
 	 * This method returns the distance from a coordinate to the robots current position/
 	 * @param x The x coordinate to compare to
@@ -349,9 +307,5 @@ public class Navigator extends Thread {
 		return result;
 	}
 
-	public void start() {
-		// Nothing needs to run here
-
-	}
 
 }

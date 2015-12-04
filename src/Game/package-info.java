@@ -1,4 +1,4 @@
 /**
-Provides the routines which initialize the robot
+Contains the Game class which provides the game-playing logic.
  */
 package Game;

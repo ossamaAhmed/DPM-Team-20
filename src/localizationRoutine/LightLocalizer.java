@@ -1,102 +1,85 @@
 package localizationRoutine;
 
-import navigationController.*;
-import navigationController.*;
-import lejos.hardware.Sound;
-import lejos.robotics.SampleProvider;
+
 import motorController.DriveController;
+import navigationController.Navigator;
+import navigationController.Odometer;
+import sensorController.FilteredColorPoller;
 
 /**
- * This class is responsible completing light localization and correcting
- * the x,y and theta position
- * @author rick
+ * Performs the routine which localizes the robot by detecting grid lines
+ * with the color sensors
  *
  */
 public class LightLocalizer {
 	// Resources
-	private Odometer odo;
-	private SampleProvider colorSource;
-	private float[] colorData;
 	private Navigator nav;
+	private Odometer odo;
 	private DriveController drive;
-
+	private FilteredColorPoller colorPoller;
 	// Variables
-	private double d = 9.5; // Distance from centre of rotation to light sensor
-	private int angleErrorThreshold = 15; // Lines must be at least this far apart to be considered distinct
-	private double lineDetectionThreshold = 0.4; // A color reading below this indicates a line
-	private int xStart = 12;
-	private int yStart = 12;
-	public static float ROTATION_SPEED = 75;
-	private double intersectionAngles[] = { 0, 0, 0, 0, 0 };
+	private static final float lineIntensity = 0.56f;
+	private static final double sensorDistance = 9;
+	private static final int abortAngle = 30;
 
 	/**
-	 * @param odo The odometer to be updated and used for localization logic
-	 * @param colorSource The color sensor to be polled for data
-	 * @param colorData The data from the polled sensor
+	 * The constructor utilizes the robots sensors, motors and navigation system
+	 * @param nav The robot's navigator
+	 * @param odo The robot's odometer
+	 * @param drive The robot's drive controller
+	 * @param colorPoller The robot's color sensor poller
 	 */
-	public LightLocalizer(Odometer odo, SampleProvider colorSource, float[] colorData, Navigator nav, DriveController drive) {
-		this.odo = odo;
-		this.colorSource = colorSource;
-		this.colorData = colorData;
+	public LightLocalizer(Navigator nav, Odometer odo, DriveController drive, FilteredColorPoller colorPoller) {
 		this.nav = nav;
+		this.odo = odo;
 		this.drive = drive;
+		this.colorPoller = colorPoller;
 	}
 
 	/**
-	 * This method executes the light localization algorithim
-	 * and then updates the x,y, and theta values afterwards
+	 * This method is responsible for performing the algorithm which will bring the robot 
+	 * to 30,30 with a heading of 90 degrees
+	 * 
 	 */
 	public void doLocalization() {
-		// Travel to starting position and face south
-		//nav.travelTo(xStart, yStart);
-		nav.turnTo(230, true);
+		drive.setSpeeds(drive.MEDIUM, drive.MEDIUM);
+		while (!lineDetected(1) && !lineDetected(2)) {
 
-		// Begin counter-clockwise turn
-		drive.setSpeeds(-1 * ROTATION_SPEED, ROTATION_SPEED);
-
-		// Record the angle of 4 intersections
-		int i = 1;
-		while (i < 5) {
-			colorSource.fetchSample(colorData, 0);
-			// If a line is detected AND the reading is distinct to ensure we don't double count lines
-			if (colorData[0] < lineDetectionThreshold && getAngleDistance(intersectionAngles[i - 1], odo.getAng()) > angleErrorThreshold) {
-				Sound.beep();
-				intersectionAngles[i] = odo.getAng();
-				i++;
-			}
 		}
-		double newX = -1 * d * Math.cos(Math.toRadians(getAngleDistance(intersectionAngles[1], intersectionAngles[3])) * 0.5);
-		double newY = -1 * d * Math.cos(Math.toRadians(getAngleDistance(intersectionAngles[2], intersectionAngles[4])) * 0.5);
-		double newTheta = 180+225- 0.5 * getAngleDistance(intersectionAngles[1], intersectionAngles[4]);
-		double newPosition[] = { newX, newY, newTheta };
-		boolean update[] = { true, true, true };
-		odo.setPosition(newPosition, update);
-
-		// Travel to 0,0,0 and stop
-		nav.travelTo(0, 0);
-		nav.turnTo(0, true);
+		odo.setAng(0);
 		drive.setSpeeds(0, 0);
+		nav.goBackwards(sensorDistance+1);
+		nav.turnUp();
+		drive.setSpeeds(drive.MEDIUM, drive.MEDIUM);
+		while (!lineDetected(1) && !lineDetected(2)) {
+
+		}
+		odo.setAng(90);
+		nav.goBackwards(sensorDistance+1);
+		drive.setSpeeds(0, 0);
+		double[] updatePos = { 30, 30, 90 };
+		boolean[] updateBoolean = { true, true, true };
+		odo.setPosition(updatePos, updateBoolean);
+		nav.turnTo(0, true);
 
 	}
 
 	/**
-	 * Helper method which returns the shortest distance between angles a and b in degrees
-	 * @param a The first angle
-	 * @param b The second angle
-	 * @return The shortest distance between angle a and b (-180 to 180 degrees)
+	 * Checks the reading if a given sensor, to see if it is detecting a line
+	 * @param sensorNumber The sensor to check
+	 * @return True if a line is detected, false otherwise
 	 */
-	public double getAngleDistance(double a, double b) {
-		// Given a and b, find the minimum distance between a and b (in degrees)
-		// while accounting for angle wrapping
-		double result = 0;
-		// Find the difference
-		result = Math.abs(a - b);
-		// Account for wrapping
-		if (result > 180) {
-			result = -1 * (result - 360);
+	public boolean lineDetected(int sensorNumber) {
+		if (colorPoller.getReadingOf(sensorNumber) < lineIntensity) {
+			return true;
 		}
 
-		return result;
+		else {
+			return false;
+		}
+
 	}
+
+	
 
 }

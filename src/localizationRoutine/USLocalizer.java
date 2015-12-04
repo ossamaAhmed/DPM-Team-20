@@ -18,7 +18,7 @@ public class USLocalizer {
 	};
 
 	// Variables
-	public static float ROTATION_SPEED = 40;
+	public static float ROTATION_SPEED = 100;
 	private int cornerAngle = 235;
 	private static final double angleThreshold = 125; // Angle A and B must differ by at least this much
 	private static final double wallAngleThreshold = 25; // Used to avoid the localization latching the same angle twice

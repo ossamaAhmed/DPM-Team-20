@@ -4,11 +4,8 @@ package FieldMap;
  * Written by: Ossama Ahmed
  * ECSE 211 - Design Principles and Methods
  * Fall 2015
- * 
  * Field class represents the physical map (NxM) matrix 
  */
-
-
 /**
  * Field class represents the physical map (NxM) matrix 
  *
@@ -20,6 +17,8 @@ public class Field {
 	private double tileSize;
 	private int xTiles;
 	private int yTiles;
+	public int xHomeZone;
+	public int yHomeZone;
 	
 	/** 
 	 * Constructor
@@ -85,6 +84,9 @@ public class Field {
 	public Tile getTile(int y,int x){
 		return this.Map[y][x];
 	}
+	public Tile[] getTile(int y){
+		return this.Map[y];
+	}
 	/** 
 	 * This method takes care of getting the list of the neighboring tiles to a specific tile
 	 * @param x is the x index of the tile you want to get it's neighbors
@@ -96,31 +98,31 @@ public class Field {
 		Tile[] neighbouringTiles= new Tile[4];
 		//getting the upper tile 
 		if(y==this.yTiles-1){
-			neighbouringTiles[0]= null;
-		}
-		else{
-			neighbouringTiles[0]= this.Map[y+1][x];
-		}
-		//getting the lower tile
-		if(y==0){
-			neighbouringTiles[1]= null;
-		}
-		else{
-			neighbouringTiles[1]= this.Map[y-1][x];
-		}
-		//getting the right tile
-		if(x==this.xTiles-1){
 			neighbouringTiles[2]= null;
 		}
 		else{
-			neighbouringTiles[2]= this.Map[y][x+1];
+			neighbouringTiles[2]= this.Map[y+1][x];
 		}
-		//getting the left tile 
-		if(x==0){
+		//getting the lower tile
+		if(y==0){
 			neighbouringTiles[3]= null;
 		}
 		else{
-			neighbouringTiles[3]= this.Map[y][x-1];
+			neighbouringTiles[3]= this.Map[y-1][x];
+		}
+		//getting the right tile
+		if(x==this.xTiles-1){
+			neighbouringTiles[0]= null;
+		}
+		else{
+			neighbouringTiles[0]= this.Map[y][x+1];
+		}
+		//getting the left tile 
+		if(x==0){
+			neighbouringTiles[1]= null;
+		}
+		else{
+			neighbouringTiles[1]= this.Map[y][x-1];
 		}
 		return neighbouringTiles;
 	}

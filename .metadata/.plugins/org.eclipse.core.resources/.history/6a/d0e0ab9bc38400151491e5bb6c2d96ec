@@ -1,8 +1,0 @@
-package FieldMap;
-
-public class FieldTest {
-
-	public static void main(String[] args){
-		System.out.println("huhrv");
-	}
-}

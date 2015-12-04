@@ -1,4 +1,4 @@
 /**
-Provides the Game logic classes.
+Contains the robot initialization class.
  */
 package initializationRoutine;

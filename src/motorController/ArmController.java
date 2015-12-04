@@ -1,5 +1,6 @@
 package motorController;
 
+import lejos.hardware.Sound;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
@@ -18,12 +19,16 @@ public class ArmController {
 	//
 	
 	// Adjustable Variables
-	private static final int armAngle[] = {135,135}; // The required rotation to raise or lower the arm
-	private static final int captureAngle[] = {135,135}; // The required rotation to raise or lower the arm
+	private static final int armAngleL[] = {110,0}; // The required rotation to raise or lower the arm
+	private static final int captureAngle[] = {110,-90}; // The required rotation to raise or lower the arm
+//	private static final int close[] = {-110,0};
 	//
 	
 
 	public ArmController(){
+
+
+		
 		}
 	
 	/**
@@ -32,6 +37,7 @@ public class ArmController {
 	 * @param index The arm that will be raised
 	 */
 	public void raiseArm(int index){
+		armMotor[index].setAcceleration(350);
 		armMotor[index].rotateTo(0);
 	}
 	
@@ -41,7 +47,8 @@ public class ArmController {
 	 * @param index The arm that will be lowered
 	 */
 	public void dropArm(int index){
-		armMotor[index].rotate(armAngle[index]);
+		armMotor[index].setAcceleration(500);
+		armMotor[index].rotateTo(armAngleL[index]);
 		
 	}
 	
@@ -51,15 +58,23 @@ public class ArmController {
 	 * @param angle The angle to raise or lower the arm to
 	 */
 	public void raiseArmTo(int index, int angle){
-		armMotor[index].rotate(angle);
+		armMotor[index].setAcceleration(250);
+		armMotor[index].rotateTo(angle);
 	}
 	
 	/**
-	 * This method changes the angle of the arms to the predefined capture angles
+	 * This method changes the arms to predefined angles to capture an object
 	 */
 	public void captureObject(){
-		raiseArmTo(0,captureAngle[0]);
 		raiseArmTo(1,captureAngle[1]);
+		Sound.beep();
+		raiseArmTo(0,captureAngle[0]);
+		Sound.beep();
+		raiseArmTo(1, 100);
+		Sound.beep();
+		raiseArm(0);
+		Sound.beep();
+
 
 	}
 }
